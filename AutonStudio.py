@@ -40,10 +40,6 @@ if __name__ == '__main__':
     startPoint_circle = None
     startPoint_line = None
     robot_rectangle = None
-    robot_line1 = None
-    robot_line2 = None
-    robot_line3 = None
-    robot_line4 = None
     robot_point = None
     robot_polygon = None
     point_lines = []
