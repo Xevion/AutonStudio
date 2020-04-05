@@ -1,3 +1,9 @@
+"""
+This file organizes all Enum classes.
+These classes help with organizing GUI Widget events into a simple space, allowing finer, more explicit control
+in a refined and Pythonic method.
+"""
+
 from enum import Enum
 
 

@@ -1,3 +1,7 @@
+"""
+This file controls all GUI operations, and acts as the heart of the program with a crude PySimpleGUI interface.
+"""
+
 import logging
 
 from PySimpleGUI import Text, Button, Listbox, Column, Image, Window, theme
@@ -9,6 +13,7 @@ logging.basicConfig(
 )
 logger = logging.getLogger('gui')
 logger.setLevel(logging.DEBUG)
+
 
 def main() -> None:
     """
@@ -33,7 +38,7 @@ def main() -> None:
     ]
     titleLayout = [
         [Text('Welcome to Auton Studio', text_color='Black', font='Verdana 20 bold', justification='center',
-                   size=[32, 1])],
+              size=[32, 1])],
         [Image('resources/autonStudioLogo.png'), Column(menu_column)],
     ]
     titleWindow = Window('Auton Studio', titleLayout)
