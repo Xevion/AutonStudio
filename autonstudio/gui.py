@@ -1,7 +1,10 @@
-from enums import TitleEvents
+import logging
 
 import PySimpleGUI as pygui
 
+from PySimpleGUI import Text, Button, Listbox, Column, Image, Window
+
+from autonstudio.enums import TitleEvents
 
 def main() -> None:
     """
@@ -10,10 +13,10 @@ def main() -> None:
 
     pygui.theme('Dark Green')
     menu_column = [
-        [pygui.Text('\n\n')],
-        [pygui.Button('Click to Continue to Studio', key='-CONTINUE_BUTTON-', font='verdana')],
-        [pygui.Button('Add Configuration', key='-CONFIG_BUTTON-', font='Verdana')],
-        [pygui.Listbox(
+        [Text('\n\n')],
+        [Button('Click to Continue to Studio', key=TitleEvents.CONTINUE_BUTTON, font='verdana')],
+        [Button('Add Configuration', key=TitleEvents.CONFIG_BUTTON, font='Verdana')],
+        [Listbox(
             [
                 'Mechanum with Odometry',
                 'Mechanum without Odometry',
@@ -25,12 +28,11 @@ def main() -> None:
         )]
     ]
     titleLayout = [
-        [pygui.Text('Welcome to Auton Studio', text_color='Black', font='Verdana 20 bold', justification='center',
+        [Text('Welcome to Auton Studio', text_color='Black', font='Verdana 20 bold', justification='center',
                    size=[32, 1])],
-        [pygui.Image('resources/autonStudioLogo.png'), pygui.Column(menu_column)],
+        [Image('resources/autonStudioLogo.png'), Column(menu_column)],
     ]
-
-    titleWindow = pygui.Window('Auton Studio', titleLayout)
+    titleWindow = Window('Auton Studio', titleLayout)
 
     while True:
         titleEvent, titleValues = titleWindow.read()
