@@ -7,7 +7,7 @@ import logging
 from PySimpleGUI import Text, Button, Listbox, Column, Image, Window, Combo, Graph, InputText, theme
 
 from autonstudio import manage
-from autonstudio.enums import TitleEvents
+from autonstudio.enums import TitleEvents, ConfigEvents
 
 logging.basicConfig(
     format='[%(asctime)s] [%(name)s] [%(levelname)s] [%(funcName)s] %(message)s',
@@ -61,25 +61,25 @@ def main() -> None:
             config.ConfigWindow = True
 
             canvas = Graph(canvas_size=[300, 300], graph_bottom_left=[0, 0], graph_top_right=[350, 350],
-                           background_color=None, key='-CANVAS-', enable_events=True)
+                           background_color=None, key=ConfigEvents.CANVAS, enable_events=True)
 
             optionsTab = [
                 [Text('\n' * 3)],
-                [Button('Add Servo', key='-ADD_SERVO_BUTTON-', font='verdana')],
-                [Button('Add Hex Core Motor', key='-ADD_HEX_CORE_BUTTON-', font='verdana')],
+                [Button('Add Servo', key=ConfigEvents.ADD_SERVO_BUTTON, font='verdana')],
+                [Button('Add Hex Core Motor', key=ConfigEvents.ADD_HEX_CORE_BUTTON, font='verdana')],
                 [Text('Select Field Configuration', font='verdana')],
-                [Combo(['FTC Skystone', 'FTC Rover Ruckus', 'None'], enable_events=True, key='-FIELD_DD-'
+                [Combo(['FTC Skystone', 'FTC Rover Ruckus', 'None'], enable_events=True, key=ConfigEvents.FIELD_DD
                        , default_value=fieldConfiguration, font='verdana')],
                 [Text('\nInput Robot Size in Inches (X by Y)', font='verdana')],
-                [InputText(enable_events=True, size=[4, 1], key='-ROBOT_SIZE_X-', font='verdana'),
+                [InputText(enable_events=True, size=[4, 1], key=ConfigEvents.ROBOT_SIZE_X, font='verdana'),
                  Text('by', font='verdana'),
-                 InputText(enable_events=True, size=[4, 1], key='-ROBOT_SIZE_Y-', font='verdana')],
+                 InputText(enable_events=True, size=[4, 1], key=ConfigEvents.ROBOT_SIZE_X, font='verdana')],
                 [Text('\n' * 8), Button('Update', key='-UPDATE_CONFIG-', bind_return_key=True, font='verdana')]]
 
             configLayout = [
                 [canvas, Column(optionsTab)],
-                [Button("Back", key='-CONFIG_BACK_BUTTON-', font='verdana'),
-                 Button('Go to Studio', key='-GOTO_STUDIO_BUTTON-', font='verdana')]
+                [Button('Back', key=ConfigEvents.CONFIG_BACK_BUTTON, font='verdana'),
+                 Button('Go to Studio', key=ConfigEvents.GOTO_STUDIO_BUTTON, font='verdana')]
             ]
 
             configWindow = Window('Configuration Menu', configLayout)
@@ -90,32 +90,32 @@ def main() -> None:
             canvas.draw_text('18 in.', [162, 13], color='black', font='Verdana 7 bold')
 
             while True and configWindowActive:
-                eventC, valuesC = configWindow.Read()
+                configEvent, configValues = configWindow.Read()
 
-                if eventC is None or eventC == '-CONFIG_BACK_BUTTON-':
+                if configEvent is None or configEvent == ConfigEvents.CONFIG_BACK_BUTTON:
                     configWindowActive = False
                     titleWindow.UnHide()
                     configWindow.Close()
                     break
 
-                if eventC == '-GOTO_STUDIO_BUTTON-':
+                if configEvent == ConfigEvents.GOTO_STUDIO_BUTTON:
                     studioWindowActive = False
                     configWindow.Close()
                     configWindowActive = False
-                    event0 = '-CONTINUE_BUTTON-'
+                    titleEvent = '-CONTINUE_BUTTON-'
                     break
 
-                if eventC == '-UPDATE_CONFIG-' and valuesC['-ROBOT_SIZE_X-'] != '' and valuesC['-ROBOT_SIZE_Y-'] != '':
+                if configEvent == ConfigEvents.UPDATE_CONFIG and configValues[ConfigEvents.ROBOT_SIZE_X] != '' and configValues[ConfigEvents.ROBOT_SIZE_Y] != '':
                     if configRobot_rectangle is not None:
                         canvas.delete_figure(configRobot_rectangle)
-                    robotSize_X = int(valuesC['-ROBOT_SIZE_X-']) * 18
-                    robotSize_Y = int(valuesC['-ROBOT_SIZE_Y-']) * 18
+                    robotSize_X = int(configValues[ConfigEvents.ROBOT_SIZE_X]) * 18
+                    robotSize_Y = int(configValues[ConfigEvents.ROBOT_SIZE_Y]) * 18
                     configRobot_rectangle = canvas.draw_rectangle([173 - robotSize_X / 2, 173 + robotSize_Y / 2],
                                                                   [173 + robotSize_X / 2, 173 - robotSize_Y / 2],
                                                                   line_width=3)
 
-                if eventC == '-FIELD_DD-':
-                    fieldConfiguration = valuesC['-FIELD_DD-']
+                if configEvent == ConfigEvents.FIELD_DD:
+                    fieldConfiguration = configValues[ConfigEvents.EVENT_DD]
 
 
 if __name__ == "__main__":
