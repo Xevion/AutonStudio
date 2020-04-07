@@ -34,5 +34,5 @@ class Helper(object):
         :param string: A string containing regular nontation integers and/or decimals.
         :return: The numbers in string format in a list.
         """
-        return Helper.digits.findAll(string)
+        return re.findall(Helper.digits, string)
 

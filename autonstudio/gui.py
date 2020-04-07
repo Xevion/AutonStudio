@@ -86,10 +86,11 @@ def main() -> None:
             configWindow = Window('Configuration Menu', configLayout)
             configWindow.finalize()
 
+            # Draw basic elements on the Canvas
             canvas.draw_rectangle([2, 2], [348, 348], line_color='black', line_width=5)
             canvas.draw_line([13, 20], [337, 20], color='black', width=2)  # 18 pixels is one inch
             canvas.draw_text('18 in.', [162, 13], color='black', font='Verdana 7 bold')
-            configRectangle = None
+            configRectangle = None  # We keep this variable available so that we can edit it multiple times.
 
             # Mainloop for Configuration Window
             while config.configActive:
@@ -113,6 +114,13 @@ def main() -> None:
                     titleEvent = TitleEvents.CONTINUE_BUTTON
                     break
 
+                # Ensure that the combo boxes only allow digits and dots for proper notation.
+                # if configEvent == ConfigEvents.ROBOT_SIZE_X:
+                #     get = manage.Helper.getDigits(configValues[configEvent])
+                #     optionsTab[6][0].update(get[0])
+                # elif configEvent == ConfigEvents.ROBOT_SIZE_Y:
+                #     optionsTab[6][2].update(manage.Helper.getDigits(configValues[configEvent])[0])
+
                 if configEvent == ConfigEvents.UPDATE_CONFIG:
                     logger.debug('Updating Robot Rectangle Configuration')
                     x, y = configValues[ConfigEvents.ROBOT_SIZE_X], configValues[ConfigEvents.ROBOT_SIZE_Y]
@@ -132,6 +140,7 @@ def main() -> None:
                             [173 + robotSize_X / 2, 173 - robotSize_Y / 2],
                             line_width=3
                         )
+                        optionsTab[4][0].update(value='Custom')
                     except ValueError:
                         logger.error(f'Invalid Robot Dimensions Received: ({x}, {y})')
 
