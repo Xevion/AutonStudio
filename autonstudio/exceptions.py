@@ -12,12 +12,4 @@ class InvalidRobotDimensions(ValueError):
 
     Valid Dimensions (x & y): (0,]
     """
-
-    def __init__(self, **kwargs):
-        self.kwargs = kwargs
-
-    def stringify(self):
-        return ', '.join(f'{k}:{v}' for k,v in self.kwargs.items())
-
-    def __repr__(self):
-        return f'InvalidRobotDimensions({self.stringify()})'
+    pass

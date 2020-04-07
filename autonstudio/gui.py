@@ -128,7 +128,7 @@ def main() -> None:
                     try:
                         x, y = float(x), float(y)
                         if x <= 0 or y <= 0:
-                            raise InvalidRobotDimensions(x=x, y=y)
+                            raise InvalidRobotDimensions()
                         robotSize_X = int(configValues[ConfigEvents.ROBOT_SIZE_X]) * 18
                         robotSize_Y = int(configValues[ConfigEvents.ROBOT_SIZE_Y]) * 18
 
