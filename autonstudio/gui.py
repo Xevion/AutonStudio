@@ -68,13 +68,13 @@ def main() -> None:
                 [Button('Add Servo', key=ConfigEvents.ADD_SERVO_BUTTON, font='verdana')],
                 [Button('Add Hex Core Motor', key=ConfigEvents.ADD_HEX_CORE_BUTTON, font='verdana')],
                 [Text('Select Field Configuration', font='verdana')],
-                [Combo(['FTC Skystone', 'FTC Rover Ruckus', 'None'], enable_events=True, key=ConfigEvents.FIELD_DD
-                       , default_value=fieldConfiguration, font='verdana')],
+                [Combo(['FTC Skystone', 'FTC Rover Ruckus', 'None'], enable_events=True, key=ConfigEvents.FIELD_DD,
+                       default_value=config.fieldConfiguration, font='verdana')],
                 [Text('\nInput Robot Size in Inches (X by Y)', font='verdana')],
                 [InputText(enable_events=True, size=[4, 1], key=ConfigEvents.ROBOT_SIZE_X, font='verdana'),
                  Text('by', font='verdana'),
-                 InputText(enable_events=True, size=[4, 1], key=ConfigEvents.ROBOT_SIZE_X, font='verdana')],
-                [Text('\n' * 8), Button('Update', key='-UPDATE_CONFIG-', bind_return_key=True, font='verdana')]]
+                 InputText(enable_events=True, size=[4, 1], key=ConfigEvents.ROBOT_SIZE_Y, font='verdana')],
+                [Text('\n' * 8), Button('Update', key=ConfigEvents.UPDATE_CONFIG, bind_return_key=True, font='verdana')]]
 
             configLayout = [
                 [canvas, Column(optionsTab)],
@@ -89,23 +89,27 @@ def main() -> None:
             canvas.draw_line([13, 20], [337, 20], color='black', width=2)  # 18 pixels is one inch
             canvas.draw_text('18 in.', [162, 13], color='black', font='Verdana 7 bold')
 
-            while True and configWindowActive:
+            # Mainloop for Configuration Window
+            while True and config.configActive:
                 configEvent, configValues = configWindow.Read()
 
+                # Logic for Invalid Event/Close/Back button
                 if configEvent is None or configEvent == ConfigEvents.CONFIG_BACK_BUTTON:
-                    configWindowActive = False
+                    config.configActive = False
                     titleWindow.UnHide()
                     configWindow.Close()
                     break
 
+                # Logic for 'Goto Studio' button in Configuration Window
                 if configEvent == ConfigEvents.GOTO_STUDIO_BUTTON:
-                    studioWindowActive = False
+                    config.studioActive = False
                     configWindow.Close()
-                    configWindowActive = False
-                    titleEvent = '-CONTINUE_BUTTON-'
+                    config.configActive = False
+                    titleEvent = TitleEvents.CONTINUE_BUTTON
                     break
 
-                if configEvent == ConfigEvents.UPDATE_CONFIG and configValues[ConfigEvents.ROBOT_SIZE_X] != '' and configValues[ConfigEvents.ROBOT_SIZE_Y] != '':
+                if configEvent == ConfigEvents.UPDATE_CONFIG and configValues[ConfigEvents.ROBOT_SIZE_X] != '' and \
+                        configValues[ConfigEvents.ROBOT_SIZE_Y] != '':
                     if configRobot_rectangle is not None:
                         canvas.delete_figure(configRobot_rectangle)
                     robotSize_X = int(configValues[ConfigEvents.ROBOT_SIZE_X]) * 18

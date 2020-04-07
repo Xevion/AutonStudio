@@ -13,3 +13,4 @@ class Config(object):
 
     def __init__(self):
         self.configActive = False  # Whether or not the Config Window is active.
+        self.fieldConfiguration = 'None'
