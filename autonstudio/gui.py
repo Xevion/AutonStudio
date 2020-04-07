@@ -8,6 +8,7 @@ from PySimpleGUI import Text, Button, Listbox, Column, Image, Window, Combo, Gra
 
 from autonstudio import manage
 from autonstudio.enums import TitleEvents, ConfigEvents
+from autonstudio.exceptions import InvalidRobotDimensions
 
 logging.basicConfig(
     format='[%(asctime)s] [%(name)s] [%(levelname)s] [%(funcName)s] %(message)s',
@@ -49,7 +50,7 @@ def main() -> None:
 
     while True:
         titleEvent, titleValues = titleWindow.read()
-        logger.debug(f'Event Received: {titleEvent}')
+        logger.debug(f'TitleWindow Event Received: {titleEvent}')
 
         # Allows the application to exit. A 'None' event is sent when the Close Button is pressed by the User.
         # Could also be sent by a erroneous or invalid event, possibly.
@@ -58,7 +59,7 @@ def main() -> None:
             break
 
         if not config.configActive and titleEvent == TitleEvents.CONFIG_BUTTON:
-            config.ConfigWindow = True
+            config.configActive = True
 
             canvas = Graph(canvas_size=[300, 300], graph_bottom_left=[0, 0], graph_top_right=[350, 350],
                            background_color=None, key=ConfigEvents.CANVAS, enable_events=True)
@@ -88,13 +89,16 @@ def main() -> None:
             canvas.draw_rectangle([2, 2], [348, 348], line_color='black', line_width=5)
             canvas.draw_line([13, 20], [337, 20], color='black', width=2)  # 18 pixels is one inch
             canvas.draw_text('18 in.', [162, 13], color='black', font='Verdana 7 bold')
+            configRectangle = None
 
             # Mainloop for Configuration Window
-            while True and config.configActive:
+            while config.configActive:
                 configEvent, configValues = configWindow.Read()
+                logger.debug(f'ConfigWindow Event Received: {configEvent}')
 
                 # Logic for Invalid Event/Close/Back button
                 if configEvent is None or configEvent == ConfigEvents.CONFIG_BACK_BUTTON:
+                    logger.debug('Exit/Invalid event received. ConfigWindow is exiting.')
                     config.configActive = False
                     titleWindow.UnHide()
                     configWindow.Close()
@@ -102,24 +106,39 @@ def main() -> None:
 
                 # Logic for 'Goto Studio' button in Configuration Window
                 if configEvent == ConfigEvents.GOTO_STUDIO_BUTTON:
+                    logger.debug('Goto Studio button received, leaving ConfigWindow.')
                     config.studioActive = False
                     configWindow.Close()
                     config.configActive = False
                     titleEvent = TitleEvents.CONTINUE_BUTTON
                     break
 
-                if configEvent == ConfigEvents.UPDATE_CONFIG and configValues[ConfigEvents.ROBOT_SIZE_X] != '' and \
-                        configValues[ConfigEvents.ROBOT_SIZE_Y] != '':
-                    if configRobot_rectangle is not None:
-                        canvas.delete_figure(configRobot_rectangle)
-                    robotSize_X = int(configValues[ConfigEvents.ROBOT_SIZE_X]) * 18
-                    robotSize_Y = int(configValues[ConfigEvents.ROBOT_SIZE_Y]) * 18
-                    configRobot_rectangle = canvas.draw_rectangle([173 - robotSize_X / 2, 173 + robotSize_Y / 2],
-                                                                  [173 + robotSize_X / 2, 173 - robotSize_Y / 2],
-                                                                  line_width=3)
+                if configEvent == ConfigEvents.UPDATE_CONFIG:
+                    logger.debug('Updating Robot Rectangle Configuration')
+                    x, y = configValues[ConfigEvents.ROBOT_SIZE_X], configValues[ConfigEvents.ROBOT_SIZE_Y]
+                    # Use a try statement to parse the values within the two fields
+                    try:
+                        x, y = float(x), float(y)
+                        if x <= 0 or y <= 0:
+                            raise InvalidRobotDimensions(x=x, y=y)
+                        robotSize_X = int(configValues[ConfigEvents.ROBOT_SIZE_X]) * 18
+                        robotSize_Y = int(configValues[ConfigEvents.ROBOT_SIZE_Y]) * 18
 
+                        if configRectangle is not None:
+                            configRectangle.delete_figure()
+
+                        configRectangle = canvas.draw_rectangle(
+                            [173 - robotSize_X / 2, 173 + robotSize_Y / 2],
+                            [173 + robotSize_X / 2, 173 - robotSize_Y / 2],
+                            line_width=3
+                        )
+                    except ValueError:
+                        logger.error(f'Invalid Robot Dimensions Received: ({x}, {y})')
+
+                # Field Configuration handling
                 if configEvent == ConfigEvents.FIELD_DD:
-                    fieldConfiguration = configValues[ConfigEvents.EVENT_DD]
+                    logger.debug('Updating Field Configuration')
+                    config.fieldConfiguration = configValues[ConfigEvents.EVENT_DD]
 
 
 if __name__ == "__main__":
