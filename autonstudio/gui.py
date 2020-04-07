@@ -138,7 +138,7 @@ def main() -> None:
                 # Field Configuration handling
                 if configEvent == ConfigEvents.FIELD_DD:
                     logger.debug('Updating Field Configuration')
-                    config.fieldConfiguration = configValues[ConfigEvents.EVENT_DD]
+                    config.fieldConfiguration = configValues[ConfigEvents.FIELD_DD]
 
 
 if __name__ == "__main__":
