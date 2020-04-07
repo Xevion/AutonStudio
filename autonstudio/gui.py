@@ -129,15 +129,19 @@ def main() -> None:
                         x, y = float(x), float(y)
                         if x <= 0 or y <= 0:
                             raise InvalidRobotDimensions()
-                        robotSize_X = int(configValues[ConfigEvents.ROBOT_SIZE_X]) * 18
-                        robotSize_Y = int(configValues[ConfigEvents.ROBOT_SIZE_Y]) * 18
 
+                        x = int(configValues[ConfigEvents.ROBOT_SIZE_X]) * 18
+                        y = int(configValues[ConfigEvents.ROBOT_SIZE_Y]) * 18
+                        config.size = (x, y)
+
+                        # Redrawing the figure
                         if configRectangle is not None:
-                            configRectangle.delete_figure()
+                            logger.debug('Deleting Robot Rectangle Preview from Canvas')
+                            canvas.delete_figure(configRectangle)
 
                         configRectangle = canvas.draw_rectangle(
-                            [173 - robotSize_X / 2, 173 + robotSize_Y / 2],
-                            [173 + robotSize_X / 2, 173 - robotSize_Y / 2],
+                            [173 - x / 2, 173 + y / 2],
+                            [173 + x / 2, 173 - y / 2],
                             line_width=3
                         )
                         optionsTab[4][0].update(value='Custom')

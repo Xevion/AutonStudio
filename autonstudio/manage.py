@@ -15,7 +15,8 @@ class Config(object):
 
     def __init__(self):
         self.configActive = False  # Whether or not the Config Window is active.
-        self.fieldConfiguration = 'None'
+        self.fieldConfiguration = 'None'  # Field configuration name
+        self.size = None  # Size of the robot
 
 
 class Helper(object):
