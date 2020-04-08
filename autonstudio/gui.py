@@ -222,7 +222,7 @@ def main() -> None:
                       [field, Column(main_column)],
                       [Button('Back', key=StudioEvents.BACK_BUTTON, font='verdana'),
                        Button('Go to Configuration Menu', key=StudioEvents.GOTO_CONFIG_BUTTON, font='verdana'),
-                       Button('Exit', key=None, font='verdana')]]
+                       Button('Exit', key=StudioEvents.EXIT_BUTTON, font='verdana')]]
 
             studioWindow = Window('EXPERIMENTAL GUI', layout)
             studioWindow.finalize()
@@ -276,7 +276,16 @@ def main() -> None:
 
                 logger.debug(f'Studio Event received: {config.studioEvent}')
 
-                if config.studioEvent is None or config.studioEvent == StudioEvents.EXIT_BUTTON:
+                # Instantaneous Exit from AutonStudio
+                if config.studioEvent == StudioEvents.EXIT_BUTTON:
+                    config.studioActive = False
+                    titleWindow.UnHide()
+                    studioWindow.Close()
+                    titleWindow.Close()
+                    break
+
+                # Back Button to Title Window
+                if config.studioEvent is None or config.studioEvent == StudioEvents.BACK_BUTTON:
                     config.studioActive = False
                     titleWindow.UnHide()
                     studioWindow.Close()
