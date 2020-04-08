@@ -19,6 +19,8 @@ class Config(object):
         self.fieldConfiguration = 'None'  # Field configuration name
         self.size = None  # Size of the robot
         self.drivetrain = 'Mechanum with Odometry'
+        self.fieldInstance = None  # Field Instance for saving while leaving Studio Window temporarily
+        self.hiddenStudio = False  # Whether or not the Studio Window is hidden temporarily
 
         self.titleEvent, self.titleValues = None, None
         self.configEvent, self.configValues = None, None

@@ -49,7 +49,12 @@ def main() -> None:
     config = manage.Config()
 
     while True:
-        config.titleEvent, config.titleValues = titleWindow.read()
+        # Allows handling for the Go to Configuration button in Studio
+        if not config.hiddenStudio:
+            config.titleEvent, config.titleValues = titleWindow.read()
+        else:
+            logger.debug('Hidden Studio detected. Event loop postponed.')
+            config.hiddenStudio = False
         logger.debug(f'TitleWindow Event Received: {config.titleEvent}')
 
         # Allows the application to exit. A 'None' event is sent when the Close Button is pressed by the User.
@@ -278,6 +283,7 @@ def main() -> None:
 
                 # Instantaneous Exit from AutonStudio
                 if config.studioEvent == StudioEvents.EXIT_BUTTON:
+                    logger.debug('Hard Exiting Studio Window')
                     config.studioActive = False
                     titleWindow.UnHide()
                     studioWindow.Close()
@@ -286,9 +292,21 @@ def main() -> None:
 
                 # Back Button to Title Window
                 if config.studioEvent is None or config.studioEvent == StudioEvents.BACK_BUTTON:
+                    logger.debug('Soft Exiting Studio Window')
                     config.studioActive = False
                     titleWindow.UnHide()
                     studioWindow.Close()
+                    break
+
+                # Go to Configuration Window temporarily
+                if config.studioEvent == StudioEvents.GOTO_CONFIG_BUTTON:
+                    logger.debug('Exiting Studio, opening Config Window')
+                    config.studioActive = False
+                    config.configActive = False
+                    config.hiddenStudio = True
+                    studioWindow.Hide()
+                    titleWindow.UnHide()
+                    config.titleEvent = TitleEvents.CONFIG_BUTTON  # Set next event to be the Config Button
                     break
 
 if __name__ == "__main__":
