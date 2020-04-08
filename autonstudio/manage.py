@@ -14,6 +14,7 @@ class Config(object):
     """
 
     def __init__(self):
+        self.studioActive = False  # Whether or not the Studio Window is active.
         self.configActive = False  # Whether or not the Config Window is active.
         self.fieldConfiguration = 'None'  # Field configuration name
         self.size = None  # Size of the robot
