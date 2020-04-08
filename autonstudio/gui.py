@@ -7,7 +7,7 @@ import logging
 from PySimpleGUI import Text, Button, Listbox, Column, Image, Window, Combo, Graph, InputText, Tab, TabGroup, theme
 
 from autonstudio import manage
-from autonstudio.enums import TitleEvents, ConfigEvents
+from autonstudio.enums import TitleEvents, ConfigEvents, StudioEvents
 from autonstudio.exceptions import InvalidRobotDimensions
 
 logging.basicConfig(
@@ -160,39 +160,39 @@ def main() -> None:
             config.studioActive = True
             titleWindow.hide()
 
-            pathInfo = Text('None', key='-PATH_INFO-', size=[20, 1], font='verdana')
-            turnInfo = Text('None', key='-TURN_INFO-', size=[20, 1], font='verdana')
-            savesInfo = Text('None', key='-SAVE_INFO-', size=[20, 1], font='verdana')
+            pathInfo = Text('None', key=StudioEvents.PATH_INFO, size=[20, 1], font='verdana')
+            turnInfo = Text('None', key=StudioEvents.TURN_INFO, size=[20, 1], font='verdana')
+            savesInfo = Text('None', key=StudioEvents.SAVE_INFO, size=[20, 1], font='verdana')
 
             # Each inch is five pixels
             field = Graph(canvas_size=[720, 720], graph_bottom_left=[0, 0], graph_top_right=[720, 720],
-                             background_color='#BAB8B8', key='-FIELD-', enable_events=True)
+                             background_color='#BAB8B8', key=StudioEvents.FIELD, enable_events=True)
             fieldSave_MASTER = field
 
-            paths_tab = [[Listbox(values=[], size=(50, 6), key='-PATH_LIST-')],
-                         [Button('Edit Path', key='-EDIT_PATH_BUTTON-', font='verdana'),
-                          Button('Round All', key='-ROUND_ALL_BUTTON-', font='verdana')],
+            paths_tab = [[Listbox(values=[], size=(50, 6), key=StudioEvents.PATH_LIST)],
+                         [Button('Edit Path', key=StudioEvents.EDIT_PATH_BUTTON, font='verdana'),
+                          Button('Round All', key=StudioEvents.ROUND_ALL_BUTTON, font='verdana')],
                          [Text('Selected Path:', font='verdana'), pathInfo],
-                         [Text('Start X', key='-START_X_TEXT-', font='verdana'),
-                          InputText(enable_events=True, size=[10, 1], key='-START_X_INPUT-', font='verdana'),
-                          Text('   Start Y', key='-START_Y_TEXT-', font='verdana'),
-                          InputText(enable_events=True, size=[10, 1], key='-START_Y_INPUT-', font='verdana')],
-                         [Text('Final X', key='-FINAL_X_TEXT-', font='verdana'),
-                          InputText(enable_events=True, size=[10, 1], key='-FINAL_X_INPUT-', font='verdana'),
-                          Text('   Final Y', key='-FINAL_Y_TEXT-', font='verdana'),
-                          InputText(enable_events=True, size=[10, 1], key='-FINAL_Y_INPUT-', font='verdana')],
+                         [Text('Start X', key=StudioEvents.START_X_TEXT, font='verdana'),
+                          InputText(enable_events=True, size=[10, 1], key=StudioEvents.START_X_INPUT, font='verdana'),
+                          Text('   Start Y', key=StudioEvents.START_Y_TEXT, font='verdana'),
+                          InputText(enable_events=True, size=[10, 1], key=StudioEvents.START_Y_INPUT, font='verdana')],
+                         [Text('Final X', key=StudioEvents.FINAL_X_TEXT, font='verdana'),
+                          InputText(enable_events=True, size=[10, 1], key=StudioEvents.FINAL_X_INPUT, font='verdana'),
+                          Text('   Final Y', key=StudioEvents.FINAL_Y_TEXT, font='verdana'),
+                          InputText(enable_events=True, size=[10, 1], key=StudioEvents.FINAL_Y_INPUT, font='verdana')],
                          [Text('Velocity', font='verdana'),
-                          InputText(enable_events=True, size=[10, 1], key='-VELOCITY_INPUT-', font='verdana')],
-                         [Button('Deselect', key='-DESELECT_BUTTON-', font='verdana')]]
+                          InputText(enable_events=True, size=[10, 1], key=StudioEvents.VELOCITY_INPUT, font='verdana')],
+                         [Button('Deselect', key=StudioEvents.DESELECT_BUTTON, font='verdana')]]
 
-            turns_tab = [[Listbox(values=[], size=(50, 6), key='-TURN_LIST-', font='verdana')],
-                         [Button('Edit Turn', key='-EDIT_TURN_BUTTON-', font='verdana')],
+            turns_tab = [[Listbox(values=[], size=(50, 6), key=StudioEvents.TURN_LIST, font='verdana')],
+                         [Button('Edit Turn', key=StudioEvents.EDIT_TURN_BUTTON, font='verdana')],
                          [Text('Selected Turn:', font='verdana'), turnInfo],
-                         [Text('Angle', key='-ANGLE_TEXT-', font='verdana'),
-                          InputText(enable_events=True, size=[10, 1], key='-ANGLE_INPUT-', font='verdana')]]
+                         [Text('Angle', key=StudioEvents.ANGLE_TEXT, font='verdana'),
+                          InputText(enable_events=True, size=[10, 1], key=StudioEvents.ANGLE_INPUT, font='verdana')]]
 
-            saves_tab = [[Listbox(values=[], size=(50, 4), key='-SAVES_LIST-', font='verdana')],
-                         [Button('Select Save', key='-SELECT_SAVE_BUTTON-', font='verdana')],
+            saves_tab = [[Listbox(values=[], size=(50, 4), key=StudioEvents.SAVES_LIST, font='verdana')],
+                         [Button('Select Save', key=StudioEvents.SELECT_SAVE_BUTTON, font='verdana')],
                          [Text('Selected Turn:', font='verdana')]]
 
             editing_tabGroup = TabGroup(
@@ -201,38 +201,38 @@ def main() -> None:
 
             saves_tabGroup = TabGroup(layout=[[Tab(layout=saves_tab, title='Saves')]])
 
-            main_column = [[Button('Save Field', key='-SAVE_BUTTON-', font='verdana'),
-                            Button('Load Field', key='-LOAD_BUTTON-', font='verdana')],
-                           [Button('Set Start Point', key='-START_POINT_BUTTON-', font='verdana')],
-                           [Button('Add Point', key='-ADD_POINT_BUTTON-', font='verdana'),
-                            Button('Delete Point', key='-DELETE_POINT_BUTTON-', font='verdana')],
-                           [Button('Add Turn', key='-ADD_TURN_BUTTON-', font='verdana'),
-                            Button('Delete Turn', key='-DELETE_TURN_BUTTON-', font='verdana')],
+            main_column = [[Button('Save Field', key=StudioEvents.SAVE_BUTTON, font='verdana'),
+                            Button('Load Field', key=StudioEvents.LOAD_BUTTON, font='verdana')],
+                           [Button('Set Start Point', key=StudioEvents.START_POINT_BUTTON, font='verdana')],
+                           [Button('Add Point', key=StudioEvents.ADD_POINT_BUTTON, font='verdana'),
+                            Button('Delete Point', key=StudioEvents.DELETE_POINT_BUTTON, font='verdana')],
+                           [Button('Add Turn', key=StudioEvents.ADD_TURN_BUTTON, font='verdana'),
+                            Button('Delete Turn', key=StudioEvents.DELETE_TURN_BUTTON, font='verdana')],
                            [Button('Add Robot Operation', font='verdana')],
-                           [Button('Simulate Robot Run', key='-SIMULATE_BUTTON-', font='verdana')],
+                           [Button('Simulate Robot Run', key=StudioEvents.SIMULATE_BUTTON, font='verdana')],
                            [Text('\nEdit Menu:', font='verdana')],
                            [editing_tabGroup],
                            [Text(
-                               'Selected Drivetrain: ' + drivetrain[drivetrain.index('['): drivetrain.index(']') + 1],
+                               f'Selected Drivetrain: {config.drivetrain}',
                                font='verdana')],
-                           [Button('Clear Field', key='-CLEAR_FIELD_BUTTON-', font='verdana')],
-                           [Button('Export Field', key='-EXPORT_BUTTON-', font='verdana')]]
+                           [Button('Clear Field', key=StudioEvents.CLEAR_FIELD_BUTTON, font='verdana')],
+                           [Button('Export Field', key=StudioEvents.EXPORT_BUTTON, font='verdana')]]
 
-            layout = [[Text('Field Configuration: ' + fieldConfiguration, font='Verdana 16 bold')],
+            layout = [[Text(f'Field Configuration: {config.fieldConfiguration}', font='Verdana 16 bold')],
                       [field, Column(main_column)],
-                      [Button('Back', key='-BACK_BUTTON-', font='verdana'),
-                       Button('Go to Configuration Menu', key='-GOTO_CONFIG_BUTTON-', font='verdana'),
-                       Button('Exit', font='verdana')]]
+                      [Button('Back', key=StudioEvents.BACK_BUTTON, font='verdana'),
+                       Button('Go to Configuration Menu', key=StudioEvents.GOTO_CONFIG_BUTTON, font='verdana'),
+                       Button('Exit', key=None, font='verdana')]]
 
             studioWindow = Window('EXPERIMENTAL GUI', layout)
             studioWindow.finalize()
 
             # Hide certain elements
-            studioWindow['-START_X_TEXT-'].hide_row()
-            studioWindow['-FINAL_X_TEXT-'].hide_row()
-            studioWindow['-VELOCITY_INPUT-'].hide_row()
-            studioWindow['-DESELECT_BUTTON-'].hide_row()
-            studioWindow['-ANGLE_TEXT-'].hide_row()
+            studioWindow[StudioEvents.START_X_TEXT].hide_row()
+            studioWindow[StudioEvents.FINAL_X_TEXT].hide_row()
+            studioWindow[StudioEvents.VELOCITY_INPUT].hide_row()
+            studioWindow[StudioEvents.DESELECT_BUTTON].hide_row()
+            studioWindow[StudioEvents.ANGLE_TEXT].hide_row()
 
             for z in range(1, 31):
                 field.draw_line([24 * z, 720], [24 * z, 0], 'light grey')
@@ -271,8 +271,16 @@ def main() -> None:
                 for y in range(0, 7):
                     field.draw_line([241, y * 40], [261, y * 40], width=0.5)
 
-        while True and config.studioActive:  # Event Loop
-            config.studioEvent, config.studioValues = studioWindow.read()  # can also be written as event, values = window()
+            while True and config.studioActive:  # Event Loop
+                config.studioEvent, config.studioValues = studioWindow.read()
+
+                logger.debug(f'Studio Event received: {config.studioEvent}')
+
+                if config.studioEvent is None or config.studioEvent == StudioEvents.EXIT_BUTTON:
+                    config.studioActive = False
+                    titleWindow.UnHide()
+                    studioWindow.Close()
+                    break
 
 if __name__ == "__main__":
     main()

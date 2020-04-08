@@ -18,6 +18,7 @@ class Config(object):
         self.configActive = False  # Whether or not the Config Window is active.
         self.fieldConfiguration = 'None'  # Field configuration name
         self.size = None  # Size of the robot
+        self.drivetrain = 'Mechanum with Odometry'
 
         self.titleEvent, self.titleValues = None, None
         self.configEvent, self.configValues = None, None
