@@ -18,6 +18,9 @@ class Config(object):
         self.fieldConfiguration = 'None'  # Field configuration name
         self.size = None  # Size of the robot
 
+        self.titleEvent, self.titleValues = None, None
+        self.configEvent, self.configValues = None, None
+
 
 class Helper(object):
     """

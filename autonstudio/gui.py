@@ -49,18 +49,18 @@ def main() -> None:
     config = manage.Config()
 
     while True:
-        titleEvent, titleValues = titleWindow.read()
-        logger.debug(f'TitleWindow Event Received: {titleEvent}')
+        config.titleEvent, config.titleValues = titleWindow.read()
+        logger.debug(f'TitleWindow Event Received: {config.titleEvent}')
 
         # Allows the application to exit. A 'None' event is sent when the Close Button is pressed by the User.
         # Could also be sent by a erroneous or invalid event, possibly.
-        if titleEvent is None:
+        if config.titleEvent is None:
             logger.critical('Exit/Invalid event received. Application is exiting.')
             break
 
-        if not config.configActive and titleEvent == TitleEvents.CONFIG_BUTTON:
+        # Activate the Configuration Window
+        if not config.configActive and config.titleEvent == TitleEvents.CONFIG_BUTTON:
             config.configActive = True
-
             canvas = Graph(canvas_size=[300, 300], graph_bottom_left=[0, 0], graph_top_right=[350, 350],
                            background_color=None, key=ConfigEvents.CANVAS, enable_events=True)
 
@@ -94,11 +94,11 @@ def main() -> None:
 
             # Mainloop for Configuration Window
             while config.configActive:
-                configEvent, configValues = configWindow.Read()
-                logger.debug(f'ConfigWindow Event Received: {configEvent}')
+                config.configEvent, config.configValues = configWindow.read()
+                logger.debug(f'ConfigWindow Event Received: {config.configEvent}')
 
                 # Logic for Invalid Event/Close/Back button
-                if configEvent is None or configEvent == ConfigEvents.CONFIG_BACK_BUTTON:
+                if config.configEvent is None or config.configEvent == ConfigEvents.CONFIG_BACK_BUTTON:
                     logger.debug('Exit/Invalid event received. ConfigWindow is exiting.')
                     config.configActive = False
                     titleWindow.UnHide()
@@ -106,32 +106,32 @@ def main() -> None:
                     break
 
                 # Logic for 'Goto Studio' button in Configuration Window
-                if configEvent == ConfigEvents.GOTO_STUDIO_BUTTON:
+                if config.configEvent == ConfigEvents.GOTO_STUDIO_BUTTON:
                     logger.debug('Goto Studio button received, leaving ConfigWindow.')
                     config.studioActive = False
                     configWindow.Close()
                     config.configActive = False
-                    titleEvent = TitleEvents.CONTINUE_BUTTON
+                    config.titleEvent = TitleEvents.CONTINUE_BUTTON
                     break
 
-                # Ensure that the combo boxes only allow digits and dots for proper notation.
+                # Ensure that the combo boxes only allow digits and dots of proper notation.
                 # if configEvent == ConfigEvents.ROBOT_SIZE_X:
                 #     get = manage.Helper.getDigits(configValues[configEvent])
                 #     optionsTab[6][0].update(get[0])
                 # elif configEvent == ConfigEvents.ROBOT_SIZE_Y:
                 #     optionsTab[6][2].update(manage.Helper.getDigits(configValues[configEvent])[0])
 
-                if configEvent == ConfigEvents.UPDATE_CONFIG:
+                if config.configEvent == ConfigEvents.UPDATE_CONFIG:
                     logger.debug('Updating Robot Rectangle Configuration')
-                    x, y = configValues[ConfigEvents.ROBOT_SIZE_X], configValues[ConfigEvents.ROBOT_SIZE_Y]
+                    x, y = config.configValues[ConfigEvents.ROBOT_SIZE_X], config.configValues[ConfigEvents.ROBOT_SIZE_Y]
                     # Use a try statement to parse the values within the two fields
                     try:
                         x, y = float(x), float(y)
                         if x <= 0 or y <= 0:
                             raise InvalidRobotDimensions()
 
-                        x = int(configValues[ConfigEvents.ROBOT_SIZE_X]) * 18
-                        y = int(configValues[ConfigEvents.ROBOT_SIZE_Y]) * 18
+                        x = int(config.configValues[ConfigEvents.ROBOT_SIZE_X]) * 18
+                        y = int(config.configValues[ConfigEvents.ROBOT_SIZE_Y]) * 18
                         config.size = (x, y)
 
                         # Redrawing the figure
@@ -149,9 +149,13 @@ def main() -> None:
                         logger.error(f'Invalid Robot Dimensions Received: ({x}, {y})')
 
                 # Field Configuration handling
-                if configEvent == ConfigEvents.FIELD_DD:
+                if config.configEvent == ConfigEvents.FIELD_DD:
                     logger.debug('Updating Field Configuration')
-                    config.fieldConfiguration = configValues[ConfigEvents.FIELD_DD]
+                    config.fieldConfiguration = config.configValues[ConfigEvents.FIELD_DD]
+
+        # Start running Studio Window
+        if config.titleEvent == TitleEvents.CONTINUE_BUTTON:
+            logger.debug('Opening Studio Window')
 
 
 if __name__ == "__main__":
