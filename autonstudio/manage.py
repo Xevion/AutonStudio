@@ -3,7 +3,7 @@ This file contains models helpful with managing data and configuration values wi
 Hopefully, most of the raw logic and calculations will be placed here in order to abstract parts of the GUI away,
 and allow for a overall simpler to debug and manage application.
 """
-
+import math
 import re
 
 from PySimpleGUI import Graph
@@ -47,6 +47,8 @@ class Config(object):
         self.robot_polygon = None
         self.delete_point_circles = []
         self.delete_turn_circles = []
+        self.pathStrings = [None]
+        self.turnStrings = [None]
 
         self.titleEvent, self.titleValues = None, None
         self.configEvent, self.configValues = None, None
