@@ -39,7 +39,7 @@ class Helper(object):
         """
         Returns digits from a string. Ignores letters and spacing, regular notation numbers accepted only.
 
-        :param string: A string containing regular nontation integers and/or decimals.
+        :param string: A string containing regular notation integers and/or decimals.
         :return: The numbers in string format in a list.
         """
         return re.findall(Helper.digits, string)
