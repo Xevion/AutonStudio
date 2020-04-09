@@ -186,8 +186,8 @@ class Point(object):
     Manages field rendering, assists with calculations, text generation and more.
     """
 
-    def __init__(self, x: int, y: int):
-        self.x, self.y = x, y
+    def __init__(self, x: int, y: int, i: int):
+        self.x, self.y, self.index = x, y, i
         self.turn = None
 
     def render(self, field: Graph, action: None) -> None:
@@ -197,6 +197,16 @@ class Point(object):
         :param action: The current action being taken by the User inside the Studio.
         """
         pass
+
+    def isClicked(self, x, y):
+        """
+        A simple helper function that helps to determine whether a point has been clicked.
+
+        :param x: X coordinate of the spot clicked on the Field.
+        :param y: Y coordinate of the spot clicked on the Field.
+        :return: A boolean that is true if the Point has been clicked.
+        """
+        return abs(x - self.x) < 10 and abs(y - self.y) < 10
 
     def __repr__(self):
         return f'Path({self.x}, {self.y})'
