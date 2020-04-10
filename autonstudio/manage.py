@@ -212,19 +212,30 @@ class Point(object):
         # basic Point attributes
         self.x, self.y, self.index, self.turn, self.velocity = x, y, i, 0.0, 42
 
-        # rendering attributes
+        # Rendering attributes
         self.deleteMarker = None
         self.turnIndicator = None
 
-    def render(self, field: Graph, action: None) -> None:
+    def render(self, canvas: Graph, action: None) -> None:
         """
         Renders the point (and associated turns) on the field, deleting it if it was rendered.
-        :param field: A field object.
+        :param canvas: A Graph object where figures will be rendered.
         :param action: The current action being taken by the User inside the Studio.
         """
         pass
 
-    def rotationScheme(self, angle: float, dps: int = 0, fps: int = 60):
+    def delete(self, canvas: Graph) -> None:
+        """
+        Helper function for ceasing rendering of figures on the canvas pertaining to this point.
+        """
+
+        # Sets equal to None and stops rendering
+        if self.deleteMarker:
+            self.deleteMarker = canvas.delete_figure(self.deleteMarker)
+        if self.turnIndicator:
+            self.turnIndicator = canvas.delete_figure(self.turnIndicator)
+
+    def rotationScheme(self, angle: float, dps: int = 0, fps: int = 60) -> list:
         """
 
         :param angle: the angle the point should end upon.
