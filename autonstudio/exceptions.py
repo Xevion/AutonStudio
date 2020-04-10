@@ -13,3 +13,10 @@ class InvalidRobotDimensions(ValueError):
     Valid Dimensions (x & y): (0,]
     """
     pass
+
+class NoPointTurning(Exception):
+    """
+    Raised whenever a Point is used in a way that requires a turn attribute when it doesn't have one.
+    """
+
+    pass

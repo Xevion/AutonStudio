@@ -8,6 +8,8 @@ import re
 
 from PySimpleGUI import Graph
 
+from autonstudio import exceptions
+
 
 class Config(object):
     """
@@ -218,6 +220,8 @@ class Point(object):
         """
         if self.turn is not None:
             return f'Turn to {self.turn} ° at ({self.x}, {self.y})'
+        else:
+            raise exceptions.NoPointTurning(f'Point #{self.index + 1} does not turn.')
 
     def isClicked(self, x, y):
         """
