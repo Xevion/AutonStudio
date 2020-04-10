@@ -535,11 +535,11 @@ def main() -> None:
                     # Turn Circle Drawing
                     if len(config.turn_circles) == 0:
                         for i in range(0, len(config.points)):
-                            drawCircle = True
-                            for t in config.turns:
-                                if t[0] == i:
-                                    drawCircle = False
-                            if drawCircle:
+                            # drawCircle = True
+                            # for t in config.turns:
+                            #     if t[0] == i:
+                            #         drawCircle = False
+                            if not any(turn[0] == i for turn in config.turns):
                                 config.turn_circles.append(field.draw_circle(config.points[i], 10, fill_color='black'))
 
                     # If you click on the field, scan if it hit one of the points
@@ -560,7 +560,7 @@ def main() -> None:
                                     PopupAnnoying('ERROR: Please enter a value')
 
                 # Delete TurnCircle figures if we're not using them
-                if config.selectedOperation != StudioActions.DELETE_TURN:
+                if config.selectedOperation == StudioActions.DELETE_TURN:
                     if len(config.turn_circles) > 0:
                         for delTurnCircle in config.turn_circles:
                             field.delete_figure(delTurnCircle)
