@@ -86,3 +86,17 @@ class StudioEvents(Enum):
     BACK_BUTTON = 'BACK_BUTTON'
     GOTO_CONFIG_BUTTON = 'GOTO_CONFIG_BUTTON'
     EXIT_BUTTON = 'EXIT_BUTTON'
+
+
+class StudioActions(Enum):
+    """
+    A Enum class used for organizing 'Actions' used by the Studio.
+    Helps maintain persistence after clicked a button (2+ step processes)
+    """
+
+    ADD_START_POINT = 'ADD_START_POINT'
+    ADD_POINT = 'ADD_POINT'
+    DELETE_POINT = 'DELETE_POINT'
+    ADD_TURN = 'ADD_TURN'
+    DELETE_TURN = 'DELETE_TURN'
+    SIMULATE = 'SIMULATE'
