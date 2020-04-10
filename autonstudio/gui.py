@@ -314,38 +314,39 @@ def main() -> None:
                     break
 
                 # Clears all field elements and paths
-                if config.studioEvent == StudioEvents.CLEAR_FIELD_BUTTON and len(config.points) > 0:
-                    field.delete_figure(config.robot_rectangle)
-                    field.delete_figure(config.robot_polygon)
-                    field.delete_figure(config.robot_point)
-                    field.delete_figure(config.startPoint_circle)
-                    for tc in config.turn_circles:
-                        field.delete_figure(tc)
-                    for tic in config.turnIndicator_circles:
-                        field.delete_figure(tic)
-                    field.delete_figure(config.startPoint_line)
-                    for pl in config.point_lines:
-                        field.delete_figure(pl)
-                    for tit in config.turnIndicator_text:
-                        field.delete_figure(tit)
-                    config.points.clear()
-                    config.point_lines.clear()
-                    config.turn_circles.clear()
-                    config.turnIndicator_circles.clear()
-                    config.turnIndicator_text.clear()
-                    config.turns.clear()
-                    config.convertedPoints.clear()
-                    config.pathStrings.clear()
-                    config.turnStrings.clear()
-                    config.fieldSave = None
+                # if config.studioEvent == StudioEvents.CLEAR_FIELD_BUTTON and len(config.points) > 0:
+                #     field.delete_figure(config.robot_rectangle)
+                #     field.delete_figure(config.robot_polygon)
+                #     field.delete_figure(config.robot_point)
+                #     field.delete_figure(config.startPoint_circle)
+                #     for tc in config.turn_circles:
+                #         field.delete_figure(tc)
+                #     for tic in config.turnIndicator_circles:
+                #         field.delete_figure(tic)
+                #     field.delete_figure(config.startPoint_line)
+                #     for pl in config.point_lines:
+                #         field.delete_figure(pl)
+                #     for tit in config.turnIndicator_text:
+                #         field.delete_figure(tit)
+                #     config.points.clear()
+                #     config.point_lines.clear()
+                #     config.turn_circles.clear()
+                #     config.turnIndicator_circles.clear()
+                #     config.turnIndicator_text.clear()
+                #     config.turns.clear()
+                #     config.convertedPoints.clear()
+                #     config.pathStrings.clear()
+                #     config.turnStrings.clear()
+                #     config.fieldSave = None
 
                 # Choose which path to edit
                 if config.studioEvent == StudioEvents.EDIT_PATH_BUTTON:
                     counter = 0
-                    pathEditUpdated = False
+                    config.pathEditUpdated = False
                     for p in config.pathStrings:
                         counter += 1
                         if len(config.studioValues[StudioEvents.PATH_LIST]) > 0 and config.studioValues[StudioEvents.PATH_LIST][0] == p:
+                            print(config.studioValues)
                             studioWindow[StudioEvents.PATH_INFO].update('Path #' + str(counter))
                             config.selectedPathNum = counter
 
@@ -360,478 +361,475 @@ def main() -> None:
                     studioWindow[StudioEvents.FINAL_X_INPUT].update(value=config.convertedPoints[config.selectedPathNum][0])
                     studioWindow[StudioEvents.FINAL_Y_INPUT].update(value=config.convertedPoints[config.selectedPathNum][1])
                     studioWindow[StudioEvents.VELOCITY_INPUT].update(value=config.velocities[config.selectedPathNum - 1])
-                    pathEditUpdated = True
+                    config.pathEditUpdated = True
 
                 # Change the values of a point based on what was entered into the entry field
-                if config.pathEditUpdated and config.studioEvent == StudioEvents.START_X_INPUT:
-                    config.points[config.selectedPathNum - 1][0] = float(
-                        manage.Helper.clean_coordinates(config.studioValues[StudioEvents.START_X_INPUT])) * 5 + (720 / 2)
-                elif config.studioEvent == StudioEvents.START_Y_INPUT:
-                    config.points[config.selectedPathNum - 1][1] = float(
-                        manage.Helper.clean_coordinates(config.studioValues[StudioEvents.START_Y_INPUT])) * 5 + (
-                                                                    720 / 2)
-                elif config.studioEvent == StudioEvents.FINAL_X_INPUT:
-                    config.points[config.selectedPathNum][0] = float(
-                        manage.Helper.clean_coordinates(config.studioValues[StudioEvents.FINAL_X_INPUT])) * 5 + (
-                                                                720 / 2)
-                elif config.studioEvent == StudioEvents.FINAL_Y_INPUT:
-                    config.points[config.selectedPathNum][1] = float(
-                        manage.Helper.clean_coordinates(config.studioValues[StudioEvents.FINAL_Y_INPUT])) * 5 + (
-                                                                720 / 2)
-                elif config.studioEvent == StudioEvents.VELOCITY_INPUT:
-                    config.velocities[config.selectedPathNum - 1] = float(
-                        manage.Helper.clean_coordinates(config.studioValues[StudioEvents.VELOCITY_INPUT]))
+                # if config.pathEditUpdated and config.studioEvent == StudioEvents.START_X_INPUT:
+                #     config.points[config.selectedPathNum - 1][0] = float(
+                #         manage.Helper.clean_coordinates(config.studioValues[StudioEvents.START_X_INPUT])) * 5 + (720 / 2)
+                # elif config.studioEvent == StudioEvents.START_Y_INPUT:
+                #     config.points[config.selectedPathNum - 1][1] = float(
+                #         manage.Helper.clean_coordinates(config.studioValues[StudioEvents.START_Y_INPUT])) * 5 + (
+                #                                                     720 / 2)
+                # elif config.studioEvent == StudioEvents.FINAL_X_INPUT:
+                #     config.points[config.selectedPathNum][0] = float(
+                #         manage.Helper.clean_coordinates(config.studioValues[StudioEvents.FINAL_X_INPUT])) * 5 + (
+                #                                                 720 / 2)
+                # elif config.studioEvent == StudioEvents.FINAL_Y_INPUT:
+                #     config.points[config.selectedPathNum][1] = float(
+                #         manage.Helper.clean_coordinates(config.studioValues[StudioEvents.FINAL_Y_INPUT])) * 5 + (
+                #                                                 720 / 2)
+                # elif config.studioEvent == StudioEvents.VELOCITY_INPUT:
+                #     config.velocities[config.selectedPathNum - 1] = float(
+                #         manage.Helper.clean_coordinates(config.studioValues[StudioEvents.VELOCITY_INPUT]))
 
                 # Rounds all the points to the nearest inch
-                if config.studioEvent == StudioEvents.ROUND_ALL_BUTTON:
-                    for i in range(0, len(config.convertedPoints)):
-                        config.points[i][0] = round(config.convertedPoints[i][0]) * 5 + (720 / 2)
-                        config.points[i][1] = round(config.convertedPoints[i][1]) * 5 + (720 / 2)
+                # if config.studioEvent == StudioEvents.ROUND_ALL_BUTTON:
+                #     for i in range(0, len(config.convertedPoints)):
+                #         config.points[i][0] = round(config.convertedPoints[i][0]) * 5 + (720 / 2)
+                #         config.points[i][1] = round(config.convertedPoints[i][1]) * 5 + (720 / 2)
 
                 # Deselect the current path
-                if config.studioEvent == StudioEvents.DESELECT_BUTTON:
-                    config.selectedPathNum = None
-                if config.selectedPathNum is None:
-                    studioWindow[StudioEvents.PATH_INFO].update('None')
-                    studioWindow[StudioEvents.START_X_TEXT].hide_row()
-                    studioWindow[StudioEvents.FINAL_X_INPUT].hide_row()
-                    studioWindow[StudioEvents.DESELECT_BUTTON].hide_row()
-                    studioWindow[StudioEvents.VELOCITY_INPUT].hide_row()
+                # if config.studioEvent == StudioEvents.DESELECT_BUTTON:
+                #     if config.selectedPathNum is not None:
+                #         logger.debug('Deselecting Path Item')
+                #         config.selectedPathNum = None
+                # if config.selectedPathNum is None:
+                #     studioWindow[StudioEvents.PATH_INFO].update('None')
+                #     studioWindow[StudioEvents.START_X_TEXT].hide_row()
+                #     studioWindow[StudioEvents.FINAL_X_INPUT].hide_row()
+                #     studioWindow[StudioEvents.DESELECT_BUTTON].hide_row()
+                #     studioWindow[StudioEvents.VELOCITY_INPUT].hide_row()
 
                 # Choose which turn to edit
-                if config.studioEvent == StudioEvents.EDIT_TURN_BUTTON:
-                    counter = 0
-                    config.turnEditUpdated = False
-                    for t in config.turnStrings:
-                        counter += 1
-                        if len(config.studioValues[StudioEvents.TURN_LIST]) > 0 and \
-                                config.studioValues[StudioEvents.TURN_LIST][0] == t:
-                            studioWindow[StudioEvents.TURN_INFO].update('Turn #' + str(counter))
-                            config.selectedTurnNum = counter
+                # if config.studioEvent == StudioEvents.EDIT_TURN_BUTTON:
+                #     counter = 0
+                #     config.turnEditUpdated = False
+                #     for t in config.turnStrings:
+                #         counter += 1
+                #         if len(config.studioValues[StudioEvents.TURN_LIST]) > 0 and \
+                #                 config.studioValues[StudioEvents.TURN_LIST][0] == t:
+                #             studioWindow[StudioEvents.TURN_INFO].update('Turn #' + str(counter))
+                #             config.selectedTurnNum = counter
 
-                if config.selectedTurnNum is None:
-                    studioWindow[StudioEvents.ANGLE_TEXT].hide_row()
-                    studioWindow[StudioEvents.TURN_INFO].update('None')
+                # if config.selectedTurnNum is None:
+                #     studioWindow[StudioEvents.ANGLE_TEXT].hide_row()
+                #     studioWindow[StudioEvents.TURN_INFO].update('None')
                 # Show the entry fields for editing the turn
-                if config.selectedTurnNum is not None and not config.turnEditUpdated:
-                    studioWindow[StudioEvents.ANGLE_TEXT].unhide_row()
-                    studioWindow[StudioEvents.ANGLE_INPUT].update(value=config.turns[config.selectedTurnNum - 1][1])
-                    config.turnEditUpdated = True
+                # if config.selectedTurnNum is not None and not config.turnEditUpdated:
+                #     studioWindow[StudioEvents.ANGLE_TEXT].unhide_row()
+                #     studioWindow[StudioEvents.ANGLE_INPUT].update(value=config.turns[config.selectedTurnNum - 1][1])
+                #     config.turnEditUpdated = True
                 # Change the angle value of a turn based on what was entered into the entry field
-                if config.turnEditUpdated:
-                    if config.studioEvent == StudioEvents.ANGLE_INPUT:
-                        config.turns[config.selectedTurnNum - 1][1] = float(
-                            manage.Helper.clean_coordinates(config.studioValues[StudioEvents.ANGLE_INPUT]))
+                # if config.turnEditUpdated:
+                #     if config.studioEvent == StudioEvents.ANGLE_INPUT:
+                #         config.turns[config.selectedTurnNum - 1][1] = float(
+                #             manage.Helper.clean_coordinates(config.studioValues[StudioEvents.ANGLE_INPUT]))
 
                 # Select start point and draw the circle for it and add it to points
-                if config.studioEvent == StudioEvents.START_POINT_BUTTON:
-                    config.selectedOperation = StudioActions.ADD_START_POINT
+                # if config.studioEvent == StudioEvents.START_POINT_BUTTON:
+                #     config.selectedOperation = StudioActions.ADD_START_POINT
 
                 # selectStartPoint op handling
-                if config.selectedOperation == StudioActions.ADD_START_POINT:
-                    # If the user clicked on the field
-                    if config.studioEvent == StudioEvents.FIELD:
-                        field.delete_figure(config.startPoint_circle)
-                        config.startPoint_circle = field.draw_circle(
-                            [config.studioValues[StudioEvents.FIELD][0], config.studioValues[StudioEvents.FIELD][1]], 5)
-                        # handling for when start point is not already picked
-                        if len(config.points) == 0:
-                            config.points.append(None)
-                        config.points[0] = [config.studioValues[StudioEvents.FIELD][0],
-                                                  config.studioValues[StudioEvents.FIELD][1]]
-                        config.startHeading = float(manage.Helper.clean_coordinates(PopupGetText(
-                            message='Enter start heading, 0 is straight up, 90 is to the right, -90 is to the left',
-                            title='Heading selection')))
-                        config.selectedOperation = None
+                # if config.selectedOperation == StudioActions.ADD_START_POINT:
+                #     # If the user clicked on the field
+                #     if config.studioEvent == StudioEvents.FIELD:
+                #         field.delete_figure(config.startPoint_circle)
+                #         config.startPoint_circle = field.draw_circle(
+                #             [config.studioValues[StudioEvents.FIELD][0], config.studioValues[StudioEvents.FIELD][1]], 5)
+                #         # handling for when start point is not already picked
+                #         if len(config.points) == 0:
+                #             config.points.append(None)
+                #         config.points[0] = [config.studioValues[StudioEvents.FIELD][0],
+                #                                   config.studioValues[StudioEvents.FIELD][1]]
+                #         config.startHeading = float(manage.Helper.clean_coordinates(PopupGetText(
+                #             message='Enter start heading, 0 is straight up, 90 is to the right, -90 is to the left',
+                #             title='Heading selection')))
+                #         config.selectedOperation = None
 
                 # Select next point and and it to list of points
                 if config.studioEvent == StudioEvents.ADD_POINT_BUTTON and len(config.points) > 0:
                     config.selectedOperation = StudioActions.ADD_POINT
 
-                if config.selectedOperation == StudioActions.ADD_POINT:
-                    # Add a point where the user clicked on the end of the path
-                    if config.studioEvent == StudioEvents.FIELD:
-                        config.points.append(
-                            [config.studioValues[StudioEvents.FIELD][0], config.studioValues[StudioEvents.FIELD][1]])
-                        config.velocities.append(config.defaultVelocity)
-                        config.selectedOperation = None
+                # if config.selectedOperation == StudioActions.ADD_POINT:
+                #     # Add a point where the user clicked on the end of the path
+                #     if config.studioEvent == StudioEvents.FIELD:
+                #         config.points.append(
+                #             [config.studioValues[StudioEvents.FIELD][0], config.studioValues[StudioEvents.FIELD][1]])
+                #         config.velocities.append(config.defaultVelocity)
+                #         config.selectedOperation = None
 
                 # Delete Point button handling
                 if config.studioEvent == StudioEvents.DELETE_POINT_BUTTON and len(config.points) > 0:
                     config.selectedOperation = StudioActions.DELETE_POINT
 
                 # Point Deletion Handling
-                if config.selectedOperation == StudioActions.DELETE_POINT:
-                    config.selectedTurnNum = None
-                    config.selectedPathNum = None
+                # if config.selectedOperation == StudioActions.DELETE_POINT:
+                #     config.selectedTurnNum = None
+                #     config.selectedPathNum = None
 
                     # Draw the Deletion Circles
-                    if len(config.delete_point_circles) == 0:
-                        for p in config.points[1:]:
-                            config.delete_point_circles.append(field.draw_circle(p, 10, fill_color='red'))
+                    # if len(config.delete_point_circles) == 0:
+                    #     for p in config.points[1:]:
+                    #         config.delete_point_circles.append(field.draw_circle(p, 10, fill_color='red'))
 
                     # Check if User clicked any
-                    if config.studioEvent == StudioEvents.FIELD:
-                        for p in config.points[1:]:  # User cannot click the first
-                            if abs(config.studioValues[StudioEvents.FIELD][0] - p[0]) < 10 and abs(
-                                    config.studioValues[StudioEvents.FIELD][1] - p[1]) < 10:
-                                index = config.points.index(p)
-                                config.points.remove(p)
-                                turn_to_remove = None
-                                for t in config.turns:
-                                    if index == t[0]:
-                                        turn_to_remove = t
-                                    if index < t[0]:
-                                        t[0] = t[0] - 1
-                                if turn_to_remove is not None:
-                                    config.turns.remove(turn_to_remove)
-                                config.selectedOperation = None
+                    # if config.studioEvent == StudioEvents.FIELD:
+                    #     for p in config.points[1:]:  # User cannot click the first
+                    #         if abs(config.studioValues[StudioEvents.FIELD][0] - p[0]) < 10 and abs(
+                    #                 config.studioValues[StudioEvents.FIELD][1] - p[1]) < 10:
+                    #             index = config.points.index(p)
+                    #             config.points.remove(p)
+                    #             turn_to_remove = None
+                    #             for t in config.turns:
+                    #                 if index == t[0]:
+                    #                     turn_to_remove = t
+                    #                 if index < t[0]:
+                    #                     t[0] = t[0] - 1
+                    #             if turn_to_remove is not None:
+                    #                 config.turns.remove(turn_to_remove)
+                    #             config.selectedOperation = None
 
                 # Delete DelPoint markers if current action is not point deletion
-                if not config.selectedOperation == StudioActions.DELETE_POINT:
-                    if len(config.delete_point_circles) > 0:
-                        for delTurnCircle in config.delete_point_circles:
-                            field.delete_figure(delTurnCircle)
-                        config.delete_point_circles.clear()
+                # if not config.selectedOperation == StudioActions.DELETE_POINT:
+                #     if len(config.delete_point_circles) > 0:
+                #         for turnCircle in config.delete_point_circles:
+                #             field.delete_figure(turnCircle)
+                #         config.delete_point_circles.clear()
 
                 # Delete Turn button handling
                 if config.studioEvent == StudioEvents.DELETE_TURN_BUTTON and len(config.turns) > 0:
                     config.selectedOperation = StudioActions.DELETE_TURN
 
                 # If Turn Deletion is ready
-                if config.selectedOperation == StudioActions.DELETE_TURN:
-                    config.selectedTurnNum = None
-                    config.selectedPathNum = None
+                # if config.selectedOperation == StudioActions.DELETE_TURN:
+                #     config.selectedTurnNum = None
+                #     config.selectedPathNum = None
 
                     # If the delete circles haven't been drawn yet, fill them in
-                    if len(config.delete_turn_circles) == 0:
-                        for t in config.turns:
-                            config.delete_turn_circles.append(
-                                field.draw_circle(config.points[t[0]], 10, fill_color='red'))
+                    # if len(config.delete_turn_circles) == 0:
+                    #     for t in config.turns:
+                    #         config.delete_turn_circles.append(
+                    #             field.draw_circle(config.points[t[0]], 10, fill_color='red'))
 
                     # If you click somewhere on the field, check if it's close enough to a point to count
-                    if config.studioEvent == StudioEvents.FIELD:
-                        for t in config.turns:
-                            if abs(config.studioValues[StudioEvents.FIELD][0] - config.points[t[0]][0]) < 10 and abs(
-                                    config.studioValues[StudioEvents.FIELD][1] - config.points[t[0]][1]) < 10:
-                                config.turns.remove(t)
-                                config.selectedOperation = None
+                    # if config.studioEvent == StudioEvents.FIELD:
+                    #     for t in config.turns:
+                    #         if abs(config.studioValues[StudioEvents.FIELD][0] - config.points[t[0]][0]) < 10 and abs(
+                    #                 config.studioValues[StudioEvents.FIELD][1] - config.points[t[0]][1]) < 10:
+                    #             config.turns.remove(t)
+                    #             config.selectedOperation = None
 
                 # Delete turn-delete-markers if the current operation is not turn deletion
-                if not config.selectedOperation == StudioActions.DELETE_TURN:
-                    print(f'Delete Turn Circles: {len(config.delete_turn_circles)})')
-                    if len(config.delete_turn_circles) > 0:
-                        for delTurnCircle in config.delete_turn_circles:
-                            field.delete_figure(delTurnCircle)
-                        config.delete_turn_circles.clear()
+                # if not config.selectedOperation == StudioActions.DELETE_TURN:
+                #     print(f'Delete Turn Circles: {len(config.delete_turn_circles)})')
+                #     if len(config.delete_turn_circles) > 0:
+                #         for turnCircle in config.delete_turn_circles:
+                #             field.delete_figure(turnCircle)
+                #         config.delete_turn_circles.clear()
 
                 # Select a spot to add a turn and add it to list of turns
                 if config.studioEvent == StudioEvents.ADD_TURN_BUTTON:
                     config.selectedOperation = StudioActions.ADD_TURN
 
                 # If current action is addingTurn
-                print(config.selectedOperation )
-                if config.selectedOperation == StudioActions.ADD_TURN:
-                    # Turn Circle Drawing
-                    if len(config.turn_circles) == 0:
-                        for i in range(0, len(config.points)):
-                            # drawCircle = True
-                            # for t in config.turns:
-                            #     if t[0] == i:
-                            #         drawCircle = False
-                            if not any(turn[0] == i for turn in config.turns):
-                                config.turn_circles.append(field.draw_circle(config.points[i], 10, fill_color='black'))
-
-                    # If you click on the field, scan if it hit one of the points
-                    if config.studioEvent == StudioEvents.FIELD:
-                        for i in range(0, len(config.points)):
-                            allowPointToBeSelected = True
-                            for t in config.turns:
-                                if t[0] == i:
-                                    allowPointToBeSelected = False
-                            if abs(config.studioValues[StudioEvents.FIELD][0] - config.points[i][0]) < 10 and abs(
-                                    config.studioValues[StudioEvents.FIELD][1] - config.points[i][
-                                        1]) < 10 and allowPointToBeSelected:
-                                angle = PopupGetText('Enter turn angle in degrees', title='Turn Angle Entry')
-                                if angle is not None:
-                                    config.turns.append([i, manage.Helper.clean_coordinates(angle)])
-                                    config.selectedOperation = None
-                                else:
-                                    PopupAnnoying('ERROR: Please enter a value')
-
-                # Delete TurnCircle figures if we're not using them
-                if config.selectedOperation == StudioActions.DELETE_TURN:
-                    if len(config.turn_circles) > 0:
-                        for delTurnCircle in config.turn_circles:
-                            field.delete_figure(delTurnCircle)
-                        config.turn_circles.clear()
+                # if config.selectedOperation == StudioActions.ADD_TURN:
+                #     # Turn Circle Drawing
+                #     if len(config.turn_circles) == 0:
+                #         for i in range(0, len(config.points)):
+                #             # Only draw turn circles for points with no known turn
+                #             if not any(turn[0] == i for turn in config.turns):
+                #                 config.turn_circles.append(field.draw_circle(config.points[i], 10, fill_color='black'))
+                #
+                #     # If you click on the field, scan if it hit one of the points
+                #     if config.studioEvent == StudioEvents.FIELD:
+                #         for i in range(0, len(config.points)):
+                #             # Only check points that do not have a turn
+                #             if not any(turn[0] == i for turn in config.turns):
+                #                 # Check that the point has been 'clicked'
+                #                 if abs(config.studioValues[StudioEvents.FIELD][0] - config.points[i][0]) < 10 and abs(
+                #                         config.studioValues[StudioEvents.FIELD][1] - config.points[i][
+                #                             1]) < 10:
+                #                     angle = PopupGetText('Enter turn angle in degrees', title='Turn Angle Entry')
+                #                     if angle is not None:
+                #                         config.turns.append([i, manage.Helper.clean_coordinates(angle)])
+                #                         config.selectedOperation = None
+                #                     else:
+                #                         PopupAnnoying('ERROR: Please enter a value')
+                #
+                # # Delete TurnCircle figures if we're not using them
+                # if config.selectedOperation == StudioActions.DELETE_TURN:
+                #     while len(config.turn_circles) > 0:
+                #         field.delete_figure(config.turn_circles.pop(0))
 
                 # Simulate the robot running through the path
-                if config.studioEvent == StudioEvents.SIMULATE_BUTTON:
-                    config.selectedOperation = StudioActions.SIMULATE
-                if config.selectedOperation == StudioActions.SIMULATE:
-                    prevTurn = None
-                    robotCBr = [45, -45]  # Bottom right corner and go clockwise
-                    robotCBl = [-45, -45]
-                    robotCTl = [-45, 45]
-                    robotCTr = [45, 45]
-                    robotPolygonPoints = [robotCBr, robotCBl, robotCTl, robotCTr]
-                    rot_deltas_final = [[[45], [-45]], [[-45], [-45]], [[-45], [45]], [[45], [45]]]
-                    if abs(config.startHeading - 0.0) > 0:
-                        rot_deltas_final = manage.Helper.calculate_rotation_per_frame(points=robotPolygonPoints, angle1=0.0,
-                                                                           angle2=config.startHeading,
-                                                                           degrees_per_second=45,
-                                                                           frames_per_second=60)
-                    for i in range(1, len(config.points)):
-                        deltas = manage.Helper.calculate_movement_per_frame(config.points[i - 1], config.points[i],
-                                                                 inches_per_second=config.velocities[i - 1],
-                                                                 frames_per_second=60,
-                                                                 pixels_per_inch=5)
-                        num_movements = math.sqrt(
-                            (config.points[i][0] - config.points[i - 1][0]) ** 2 + (
-                                    config.points[i][1] - config.points[i - 1][1]) ** 2) / math.hypot(
-                            deltas[0], deltas[1])
-                        x, y = config.points[i - 1]
-                        for t in config.turns:
-                            if t[0] == i - 1:
-                                if prevTurn is None:
-                                    angle1 = config.startHeading
-                                else:
-                                    angle1 = prevTurn[1]
-                                robotCBr = [45, -45]  # Bottom right corner and go clockwise
-                                robotCBl = [-45, -45]
-                                robotCTl = [-45, 45]
-                                robotCTr = [45, 45]
-                                robotPolygonPoints = [robotCBr, robotCBl, robotCTl, robotCTr]
-                                rot_deltas = manage.Helper.calculate_rotation_per_frame(points=robotPolygonPoints,
-                                                                             angle1=angle1,
-                                                                             angle2=t[1], degrees_per_second=45,
-                                                                             frames_per_second=60)
-                                if abs(float(t[1]) - float(angle1)) > 0:
-                                    rot_deltas_final = rot_deltas.copy()
-                                prevTurn = t
-                                for j in range(0, len(rot_deltas[0][0]) - 1):
-                                    start_time = time.time()
-                                    field.delete_figure(config.robot_polygon)
-                                    field.delete_figure(config.robot_point)
-                                    robotCBr = [x + rot_deltas_final[0][0][j],
-                                                y + rot_deltas_final[0][1][
-                                                    j]]  # Bottom right corner and go clockwise
-                                    robotCBl = [x + rot_deltas_final[1][0][j], y + rot_deltas_final[1][1][j]]
-                                    robotCTl = [x + rot_deltas_final[2][0][j], y + rot_deltas_final[2][1][j]]
-                                    robotCTr = [x + rot_deltas_final[3][0][j], y + rot_deltas_final[3][1][j]]
-                                    robotPolygonPoints = [robotCBr, robotCBl, robotCTl, robotCTr]
-                                    config.robot_polygon = field.draw_polygon(robotPolygonPoints, line_color='black',
-                                                                       line_width='3', fill_color='')
-                                    robotLinePoints = [
-                                        [((robotCTr[0] + robotCBr[0]) / 2.0), ((robotCTr[1] + robotCBr[1]) / 2.0)],
-                                        [((robotCTr[0] + robotCBr[0]) / 2.0) - 20,
-                                         ((robotCTr[1] + robotCBr[1]) / 2.0) - 20]]
-                                    config.robot_point = field.draw_point(point=robotLinePoints[0], color='yellow',
-                                                                   size=15)
-                                    studioWindow.refresh()
-                                    sleepTime = max(0, 1 / 60 - (time.time() - start_time))
-                                    time.sleep(sleepTime)
+                # if config.studioEvent == StudioEvents.SIMULATE_BUTTON:
+                #     prevTurn = None
+                #     robotCBr = [45, -45]  # Bottom right corner and go clockwise
+                #     robotCBl = [-45, -45]
+                #     robotCTl = [-45, 45]
+                #     robotCTr = [45, 45]
+                #     robotPolygonPoints = [robotCBr, robotCBl, robotCTl, robotCTr]
+                #     rot_deltas_final = [[[45], [-45]], [[-45], [-45]], [[-45], [45]], [[45], [45]]]
+                #     if abs(config.startHeading - 0.0) > 0:
+                #         rot_deltas_final = manage.Helper.calculate_rotation_per_frame(points=robotPolygonPoints, angle1=0.0,
+                #                                                            angle2=config.startHeading,
+                #                                                            degrees_per_second=45,
+                #                                                            frames_per_second=60)
+                #     for i in range(1, len(config.points)):
+                #         deltas = manage.Helper.calculate_movement_per_frame(config.points[i - 1], config.points[i],
+                #                                                  inches_per_second=config.velocities[i - 1],
+                #                                                  frames_per_second=60,
+                #                                                  pixels_per_inch=5)
+                #         num_movements = math.sqrt(
+                #             (config.points[i][0] - config.points[i - 1][0]) ** 2 + (
+                #                     config.points[i][1] - config.points[i - 1][1]) ** 2) / math.hypot(
+                #             deltas[0], deltas[1])
+                #         x, y = config.points[i - 1]
+                #         for t in config.turns:
+                #             if t[0] == i - 1:
+                #                 if prevTurn is None:
+                #                     angle1 = config.startHeading
+                #                 else:
+                #                     angle1 = prevTurn[1]
+                #                 robotCBr = [45, -45]  # Bottom right corner and go clockwise
+                #                 robotCBl = [-45, -45]
+                #                 robotCTl = [-45, 45]
+                #                 robotCTr = [45, 45]
+                #                 robotPolygonPoints = [robotCBr, robotCBl, robotCTl, robotCTr]
+                #                 rot_deltas = manage.Helper.calculate_rotation_per_frame(points=robotPolygonPoints,
+                #                                                              angle1=angle1,
+                #                                                              angle2=t[1], degrees_per_second=45,
+                #                                                              frames_per_second=60)
+                #                 if abs(float(t[1]) - float(angle1)) > 0:
+                #                     rot_deltas_final = rot_deltas.copy()
+                #                 prevTurn = t
+                #                 for j in range(0, len(rot_deltas[0][0]) - 1):
+                #                     start_time = time.time()
+                #                     field.delete_figure(config.robot_polygon)
+                #                     field.delete_figure(config.robot_point)
+                #
+                #                     # Bottom right corner and go clockwise
+                #                     robotCBr = [x + rot_deltas_final[0][0][j], y + rot_deltas_final[0][1][j]]
+                #                     robotCBl = [x + rot_deltas_final[1][0][j], y + rot_deltas_final[1][1][j]]
+                #                     robotCTl = [x + rot_deltas_final[2][0][j], y + rot_deltas_final[2][1][j]]
+                #                     robotCTr = [x + rot_deltas_final[3][0][j], y + rot_deltas_final[3][1][j]]
+                #                     robotPolygonPoints = [robotCBr, robotCBl, robotCTl, robotCTr]
+                #                     config.robot_polygon = field.draw_polygon(robotPolygonPoints, line_color='black',
+                #                                                        line_width='3', fill_color='')
+                #                     robotLinePoints = [
+                #                         [
+                #                             (robotCTr[0] + robotCBr[0]) / 2.0, (robotCTr[1] + robotCBr[1]) / 2.0
+                #                         ],
+                #                         [
+                #                             ((robotCTr[0] + robotCBr[0]) / 2.0) - 20, ((robotCTr[1] + robotCBr[1]) / 2.0) - 20
+                #                         ]
+                #                     ]
+                #                     config.robot_point = field.draw_point(point=robotLinePoints[0], color='yellow',
+                #                                                    size=15)
+                #                     studioWindow.refresh()
+                #                     sleepTime = max(0, 1 / 60 - (time.time() - start_time))
+                #                     time.sleep(sleepTime)
+                #
+                #         for j in range(0, int(num_movements)):
+                #             start_time = time.time()
+                #             x += deltas[0]
+                #             y += deltas[1]
+                #             field.delete_figure(config.robot_polygon)
+                #             field.delete_figure(config.robot_point)
+                #             robotCBr = [x + rot_deltas_final[0][0][-1],
+                #                         y + rot_deltas_final[0][1][-1]]  # Bottom right corner and go clockwise
+                #             robotCBl = [x + rot_deltas_final[1][0][-1], y + rot_deltas_final[1][1][-1]]
+                #             robotCTl = [x + rot_deltas_final[2][0][-1], y + rot_deltas_final[2][1][-1]]
+                #             robotCTr = [x + rot_deltas_final[3][0][-1], y + rot_deltas_final[3][1][-1]]
+                #             robotPolygonPoints = [robotCBr, robotCBl, robotCTl, robotCTr]
+                #             config.robot_polygon = field.draw_polygon(robotPolygonPoints, line_color='black',
+                #                                                line_width='3',
+                #                                                fill_color='')
+                #             config.robotPoint = [((robotCTr[0] + robotCBr[0]) / 2.0), ((robotCTr[1] + robotCBr[1]) / 2.0)]
+                #             if config.startHeading == 0 and rot_deltas_final == [[[45], [-45]], [[-45], [-45]],
+                #                                                           [[-45], [45]],
+                #                                                           [[45], [45]]]:
+                #                 config.robotPoint = [((robotCTr[0] + robotCTl[0]) / 2.0),
+                #                               ((robotCTr[1] + robotCTl[1]) / 2.0)]
+                #             config.robot_point = field.draw_point(point=config.robotPoint, color='yellow', size=15)
+                #             studioWindow.refresh()
+                #             sleepTime = 1 / 60 - (time.time() - start_time)
+                #             if sleepTime < 0:
+                #                 sleepTime = 0
+                #             time.sleep(sleepTime)
+                #     config.selectedOperation = None
 
-                        for j in range(0, int(num_movements)):
-                            start_time = time.time()
-                            x += deltas[0]
-                            y += deltas[1]
-                            field.delete_figure(config.robot_polygon)
-                            field.delete_figure(config.robot_point)
-                            robotCBr = [x + rot_deltas_final[0][0][-1],
-                                        y + rot_deltas_final[0][1][-1]]  # Bottom right corner and go clockwise
-                            robotCBl = [x + rot_deltas_final[1][0][-1], y + rot_deltas_final[1][1][-1]]
-                            robotCTl = [x + rot_deltas_final[2][0][-1], y + rot_deltas_final[2][1][-1]]
-                            robotCTr = [x + rot_deltas_final[3][0][-1], y + rot_deltas_final[3][1][-1]]
-                            robotPolygonPoints = [robotCBr, robotCBl, robotCTl, robotCTr]
-                            config.robot_polygon = field.draw_polygon(robotPolygonPoints, line_color='black',
-                                                               line_width='3',
-                                                               fill_color='')
-                            config.robotPoint = [((robotCTr[0] + robotCBr[0]) / 2.0), ((robotCTr[1] + robotCBr[1]) / 2.0)]
-                            if config.startHeading == 0 and rot_deltas_final == [[[45], [-45]], [[-45], [-45]],
-                                                                          [[-45], [45]],
-                                                                          [[45], [45]]]:
-                                config.robotPoint = [((robotCTr[0] + robotCTl[0]) / 2.0),
-                                              ((robotCTr[1] + robotCTl[1]) / 2.0)]
-                            config.robot_point = field.draw_point(point=config.robotPoint, color='yellow', size=15)
-                            studioWindow.refresh()
-                            sleepTime = 1 / 60 - (time.time() - start_time)
-                            if sleepTime < 0:
-                                sleepTime = 0
-                            time.sleep(sleepTime)
-                    config.selectedOperation = None
+                # if config.studioEvent == StudioEvents.EXPORT_BUTTON:
+                #     if len(config.convertedPoints) > 0:
+                #         export_location = ''
+                #         while export_location == '':
+                #             export_location = PopupGetFolder('Choose Export Location')
+                #         if export_location is not None:
+                #             export_location = export_location + '/AutonPath.java'
+                #             export_file = open(export_location, 'w')
+                #             export_string = ''
+                #             export_string += 'package org.firstinspires.ftc.teamcode;\n\n'
+                #             export_string += 'import com.qualcomm.robotcore.eventloop.opmode.Autonomous;\n\n'
+                #             export_string += '@Autonomous\n'
+                #             export_string += 'public class AutonPath extends PositionBasedAuton3 {\n'
+                #             export_string += 'public void setStartPos(){\n'
+                #             export_string += f'startX = {config.convertedPoints[0][0]}; startY = {config.convertedPoints[0][1]};\n'
+                #             export_string += f'startOrientation = {config.startHeading};\n'
+                #             export_string += '}\n\n'
+                #             export_string += 'public void drive(){\n'
+                #             heading = config.startHeading
+                #             for i in range(1, len(config.points)):
+                #                 for t in config.turns:
+                #                     if t[0] == i - 1:
+                #                         export_string += f'turn({t[1]},TURN_SPEED,positioning);\n'
+                #                         heading = t[1]
+                #                 export_string += f'driveToPosition({config.convertedPoints[i][0]},{config.convertedPoints[i][1]},DRIVE_SPEED,{heading},0,0,positioning,sensing);\n'
+                #             export_string += '}}'
+                #             export_file.write(export_string)
+                #             Popup('Export Successful!')
+                #     else:
+                #         Popup('No Paths to Export')
+                #
+                # if config.studioEvent == StudioEvents.SAVE_BUTTON:
+                #     save_name = ''
+                #     while save_name == '':
+                #         save_name = PopupGetText('Name:')
+                #     if save_name is not None:
+                #         save_location = PopupGetFolder('', no_window=True)
+                #         save_location = save_location + '/' + save_name + '.auton'
+                #         save_file = open(save_location, 'w')
+                #         save_string = ''
+                #         save_string += str(len(config.points)) + '\n'
+                #         for p in config.points:
+                #             save_string += f'{p[0]} {p[1]}\n'
+                #         save_string += str(len(config.turns)) + '\n'
+                #         for t in config.turns:
+                #             save_string += f'{t[0]} {t[1]}\n'
+                #         save_file.write(save_string)
+                #         save_file.close()
 
-                if config.studioEvent == StudioEvents.EXPORT_BUTTON:
-                    if len(config.convertedPoints) > 0:
-                        export_location = ''
-                        while export_location == '':
-                            export_location = PopupGetFolder('Choose Export Location')
-                        if export_location is not None:
-                            export_location = export_location + '/AutonPath.java'
-                            export_file = open(export_location, 'w')
-                            export_string = ''
-                            export_string += 'package org.firstinspires.ftc.teamcode;\n\n'
-                            export_string += 'import com.qualcomm.robotcore.eventloop.opmode.Autonomous;\n\n'
-                            export_string += '@Autonomous\n'
-                            export_string += 'public class AutonPath extends PositionBasedAuton3 {\n'
-                            export_string += 'public void setStartPos(){\n'
-                            export_string += f'startX = {config.convertedPoints[0][0]}; startY = {config.convertedPoints[0][1]};\n'
-                            export_string += f'startOrientation = {config.startHeading};\n'
-                            export_string += '}\n\n'
-                            export_string += 'public void drive(){\n'
-                            heading = config.startHeading
-                            for i in range(1, len(config.points)):
-                                for t in config.turns:
-                                    if t[0] == i - 1:
-                                        export_string += f'turn({t[1]},TURN_SPEED,positioning);\n'
-                                        heading = t[1]
-                                export_string += f'driveToPosition({config.convertedPoints[i][0]},{config.convertedPoints[i][1]},DRIVE_SPEED,{heading},0,0,positioning,sensing);\n'
-                            export_string += '}}'
-                            export_file.write(export_string)
-                            Popup('Export Successful!')
-                    else:
-                        Popup('No Paths to Export')
-
-                if config.studioEvent == StudioEvents.SAVE_BUTTON:
-                    save_name = ''
-                    while save_name == '':
-                        save_name = PopupGetText('Name:')
-                    if save_name is not None:
-                        save_location = PopupGetFolder('', no_window=True)
-                        save_location = save_location + '/' + save_name + '.auton'
-                        save_file = open(save_location, 'w')
-                        save_string = ''
-                        save_string += str(len(config.points)) + '\n'
-                        for p in config.points:
-                            save_string += f'{p[0]} {p[1]}\n'
-                        save_string += str(len(config.turns)) + '\n'
-                        for t in config.turns:
-                            save_string += f'{t[0]} {t[1]}\n'
-                        save_file.write(save_string)
-                        save_file.close()
-
-                if config.studioEvent == StudioEvents.LOAD_BUTTON:
-                    choice = PopupYesNo(
-                        'Do you want to load a save?\nYou will lose any unsaved progress if you do so.')
-                    if choice == 'Yes':
-                        config.points.clear()
-                        config.turns.clear()
-                        config.velocities.clear()
-                        save_location = PopupGetFile('Hello', no_window=True,
-                                                     file_types=(("Auton Files", "*.auton"),))
-                        save_file = open(save_location, 'r')
-                        num_points = int(save_file.readline())
-                        for i in range(num_points):
-                            line = save_file.readline().split()
-                            config.points.append([int(line[0]), int(line[1])])
-                            config.velocities.append(config.defaultVelocity)
-                        num_turns = int(save_file.readline())
-                        for i in range(num_turns):
-                            line = save_file.readline().split()
-                            config.turns.append([int(line[0]), int(line[1])])
-                        save_file.close()
+                # if config.studioEvent == StudioEvents.LOAD_BUTTON:
+                #     choice = PopupYesNo(
+                #         'Do you want to load a save?\nYou will lose any unsaved progress if you do so.')
+                #     if choice == 'Yes':
+                #         config.points.clear()
+                #         config.turns.clear()
+                #         config.velocities.clear()
+                #         save_location = PopupGetFile('Hello', no_window=True,
+                #                                      file_types=(("Auton Files", "*.auton"),))
+                #         save_file = open(save_location, 'r')
+                #         num_points = int(save_file.readline())
+                #         for i in range(num_points):
+                #             line = save_file.readline().split()
+                #             config.points.append([int(line[0]), int(line[1])])
+                #             config.velocities.append(config.defaultVelocity)
+                #         num_turns = int(save_file.readline())
+                #         for i in range(num_turns):
+                #             line = save_file.readline().split()
+                #             config.turns.append([int(line[0]), int(line[1])])
+                #         save_file.close()
 
                 # Add points and turns to list of paths and turns, then display them in the path and turn list
-                config.pathStrings = []
-                config.convertedPoints = manage.Helper.convert_coordinates_to_inches(config.points, pixels_per_inch=5,
-                                                                              field_length_inches=144)
-                heading = config.startHeading
-                prevTurn = None
-                for i in range(1, len(config.points)):
-                    for t in config.turns:
-                        if t[0] == i - 1:
-                            if prevTurn is None:
-                                heading = config.startHeading
-                            else:
-                                heading = prevTurn[1]
-                        prevTurn = t
-                    config.pathStrings.append(
-                        'Path #' + str(i) + ': ' + manage.Helper.generate_path_string(config.convertedPoints[i - 1],
-                                                                                      config.convertedPoints[i],
-                                                                                      config.velocities[i - 1],
-                                                                                      heading))
-                studioWindow[StudioEvents.PATH_LIST].update(values=config.pathStrings)
-                config.turnStrings = []
-                config.turns = manage.Helper.sort_turns(config.turns)
-                for i in range(0, len(config.turns)):
-                    config.turnStrings.append(
-                        'Turn #' + str(i + 1) + ": " + manage.Helper.generate_turn_string(config.turns[i], config.convertedPoints))
-                studioWindow[StudioEvents.TURN_LIST].update(values=config.turnStrings)
+                # config.pathStrings = []
+                # config.convertedPoints = manage.Helper.convert_coordinates_to_inches(config.points, pixels_per_inch=5,
+                #                                                               field_length_inches=144)
+                # heading = config.startHeading
+                # prevTurn = None
+                # for i in range(1, len(config.points)):
+                #     for t in config.turns:
+                #         if t[0] == i - 1:
+                #             if prevTurn is None:
+                #                 heading = config.startHeading
+                #             else:
+                #                 heading = prevTurn[1]
+                #         prevTurn = t
+                #     config.pathStrings.append(
+                #         'Path #' + str(i) + ': ' + manage.Helper.generate_path_string(config.convertedPoints[i - 1],
+                #                                                                       config.convertedPoints[i],
+                #                                                                       config.velocities[i - 1],
+                #                                                                       heading))
+                # studioWindow[StudioEvents.PATH_LIST].update(values=config.pathStrings)
+                # config.turnStrings = []
+                # config.turns = manage.Helper.sort_turns(config.turns)
+                # for i in range(0, len(config.turns)):
+                #     config.turnStrings.append(
+                #         'Turn #' + str(i + 1) + ": " + manage.Helper.generate_turn_string(config.turns[i], config.convertedPoints))
+                # studioWindow[StudioEvents.TURN_LIST].update(values=config.turnStrings)
 
                 # Draw turn indicators
-                for i in range(len(config.turnIndicator_circles)):
-                    field.delete_figure(config.turnIndicator_circles[i])
-                    field.delete_figure(config.turnIndicator_text[i])
-                for i in range(0, len(config.turns)):
-                    if len(config.turnIndicator_circles) < i + 1:
-                        config.turnIndicator_circles.append(None)
-                        config.turnIndicator_text.append(None)
-                    config.turnIndicator_circles[i] = field.draw_circle(config.points[config.turns[i][0]], 5,
-                                                                        fill_color='black')
-                    config.turnIndicator_text[i] = field.draw_text(text=str(config.turns[i][1]) + '°',
-                                                                   location=[config.points[config.turns[i][0]][0] + 10,
-                                                                             config.points[config.turns[i][0]][1] + 10],
-                                                                   color='dark blue')
+                # for i in range(len(config.turnIndicator_circles)):
+                #     field.delete_figure(config.turnIndicator_circles[i])
+                #     field.delete_figure(config.turnIndicator_text[i])
+                # for i in range(0, len(config.turns)):
+                #     if len(config.turnIndicator_circles) < i + 1:
+                #         config.turnIndicator_circles.append(None)
+                #         config.turnIndicator_text.append(None)
+                #     config.turnIndicator_circles[i] = field.draw_circle(config.points[config.turns[i][0]], 5,
+                #                                                         fill_color='black')
+                #     config.turnIndicator_text[i] = field.draw_text(text=str(config.turns[i][1]) + '°',
+                #                                                    location=[config.points[config.turns[i][0]][0] + 10,
+                #                                                              config.points[config.turns[i][0]][1] + 10],
+                #                                                    color='dark blue')
 
                 # Draw robot on the field and ensures the robot cannot be magically clipping through
                 # the field walls (robot starts touching field wall if outside boundary)
-                if len(config.points) > 0:
-                    field.delete_figure(config.robot_polygon)
-                    field.delete_figure(config.robot_point)
-                    robotCBr = [45, -45]  # Bottom right corner and go clockwise
-                    robotCBl = [-45, -45]
-                    robotCTl = [-45, 45]
-                    robotCTr = [45, 45]
-                    robotPolygonPoints = [robotCBr, robotCBl, robotCTl, robotCTr]
-                    rot_deltas_final = [[[45], [-45]], [[-45], [-45]], [[-45], [45]], [[45], [45]]]
-                    if abs(config.startHeading - 0.0) > 0:
-                        rot_deltas_final = manage.Helper.calculate_rotation_per_frame(points=robotPolygonPoints, angle1=0.0,
-                                                                           angle2=config.startHeading,
-                                                                           degrees_per_second=45,
-                                                                           frames_per_second=60)
-                    robotCBr = [config.points[0][0] + rot_deltas_final[0][0][-1],
-                                config.points[0][1] + rot_deltas_final[0][1][
-                                    -1]]  # Bottom right corner and go clockwise
-                    robotCBl = [config.points[0][0] + rot_deltas_final[1][0][-1],
-                                config.points[0][1] + rot_deltas_final[1][1][-1]]
-                    robotCTl = [config.points[0][0] + rot_deltas_final[2][0][-1],
-                                config.points[0][1] + rot_deltas_final[2][1][-1]]
-                    robotCTr = [config.points[0][0] + rot_deltas_final[3][0][-1],
-                                config.points[0][1] + rot_deltas_final[3][1][-1]]
-                    robotPolygonPoints = [robotCBr, robotCBl, robotCTl, robotCTr]
-                    config.robot_polygon = field.draw_polygon(robotPolygonPoints, line_color='black', line_width='3',
-                                                       fill_color='')
-                    config.robotPoint = [((robotCTr[0] + robotCBr[0]) / 2.0), ((robotCTr[1] + robotCBr[1]) / 2.0)]
-                    if config.startHeading == 0:
-                        config.robotPoint = [((robotCTr[0] + robotCTl[0]) / 2.0), ((robotCTr[1] + robotCTl[1]) / 2.0)]
-                    config.robot_point = field.draw_point(point=config.robotPoint, color='yellow', size=15)
-
-                    # Draw lines between all points
-                    print(config.points)
-                    if len(config.points) > 0:
-                        field.delete_figure(config.startPoint_circle)
-                        config.startPoint_circle = field.draw_circle(config.points[0], 5)
-                    field.delete_figure(config.startPoint_line)
-                    if len(config.points) > 1:
-                        lineColor = 'black'
-                        if config.selectedPathNum == 1:
-                            lineColor = 'yellow'
-                        config.startPoint_line = field.draw_line(config.points[0], config.points[1], color=lineColor,
-                                                          width=2.0)
-                    for pl in config.point_lines:
-                        field.delete_figure(pl)
-                    for i in range(2, len(config.points)):
-                        lineColor = 'black'
-                        if config.selectedPathNum == i:
-                            lineColor = 'yellow'
-                        if len(config.point_lines) < i - 1:
-                            config.point_lines.append(None)
-                        config.point_lines[i - 2] = (
-                            field.draw_line(config.points[i - 1], config.points[i], color=lineColor, width=2.0))
+                # if len(config.points) > 0:
+                #     field.delete_figure(config.robot_polygon)
+                #     field.delete_figure(config.robot_point)
+                #     robotCBr = [45, -45]  # Bottom right corner and go clockwise
+                #     robotCBl = [-45, -45]
+                #     robotCTl = [-45, 45]
+                #     robotCTr = [45, 45]
+                #     robotPolygonPoints = [robotCBr, robotCBl, robotCTl, robotCTr]
+                #     rot_deltas_final = [[[45], [-45]], [[-45], [-45]], [[-45], [45]], [[45], [45]]]
+                #     if abs(config.startHeading - 0.0) > 0:
+                #         rot_deltas_final = manage.Helper.calculate_rotation_per_frame(points=robotPolygonPoints, angle1=0.0,
+                #                                                            angle2=config.startHeading,
+                #                                                            degrees_per_second=45,
+                #                                                            frames_per_second=60)
+                #     robotCBr = [config.points[0][0] + rot_deltas_final[0][0][-1],
+                #                 config.points[0][1] + rot_deltas_final[0][1][
+                #                     -1]]  # Bottom right corner and go clockwise
+                #     robotCBl = [config.points[0][0] + rot_deltas_final[1][0][-1],
+                #                 config.points[0][1] + rot_deltas_final[1][1][-1]]
+                #     robotCTl = [config.points[0][0] + rot_deltas_final[2][0][-1],
+                #                 config.points[0][1] + rot_deltas_final[2][1][-1]]
+                #     robotCTr = [config.points[0][0] + rot_deltas_final[3][0][-1],
+                #                 config.points[0][1] + rot_deltas_final[3][1][-1]]
+                #     robotPolygonPoints = [robotCBr, robotCBl, robotCTl, robotCTr]
+                #     config.robot_polygon = field.draw_polygon(robotPolygonPoints, line_color='black', line_width='3',
+                #                                        fill_color='')
+                #     config.robotPoint = [((robotCTr[0] + robotCBr[0]) / 2.0), ((robotCTr[1] + robotCBr[1]) / 2.0)]
+                #     if config.startHeading == 0:
+                #         config.robotPoint = [((robotCTr[0] + robotCTl[0]) / 2.0), ((robotCTr[1] + robotCTl[1]) / 2.0)]
+                #     config.robot_point = field.draw_point(point=config.robotPoint, color='yellow', size=15)
+                #
+                #     # Draw lines between all points
+                #     print(config.points)
+                #     if len(config.points) > 0:
+                #         field.delete_figure(config.startPoint_circle)
+                #         config.startPoint_circle = field.draw_circle(config.points[0], 5)
+                #     field.delete_figure(config.startPoint_line)
+                #     if len(config.points) > 1:
+                #         lineColor = 'black'
+                #         if config.selectedPathNum == 1:
+                #             lineColor = 'yellow'
+                #         config.startPoint_line = field.draw_line(config.points[0], config.points[1], color=lineColor,
+                #                                           width=2.0)
+                #     for pl in config.point_lines:
+                #         field.delete_figure(pl)
+                #     for i in range(2, len(config.points)):
+                #         lineColor = 'black'
+                #         if config.selectedPathNum == i:
+                #             lineColor = 'yellow'
+                #         if len(config.point_lines) < i - 1:
+                #             config.point_lines.append(None)
+                #         config.point_lines[i - 2] = (
+                #             field.draw_line(config.points[i - 1], config.points[i], color=lineColor, width=2.0))
 
                 # export_file.close()
-                titleWindow.close()
+                # titleWindow.close()
 
 
 if __name__ == "__main__":
