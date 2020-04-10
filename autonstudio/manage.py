@@ -62,6 +62,8 @@ class Config(object):
 
         # Variables used for tracking points
         self.ppoints = []
+        self.pointMenuIndex = None  # The index of the selected point within the points list.
+        self.pointEditorUpdate = False  # Whether or not the point editing menu has updated.
 
 
 class Helper(object):
@@ -70,7 +72,8 @@ class Helper(object):
     Not to be instantiated. Static methods only.
     """
 
-    digits = re.compile("\d+(?:\.\d+)")
+    digits_pattern = re.compile("\d+(?:\.\d+)")
+    path_pattern = re.compile('Path #(\d+):')  # Used for identifying the current selected path within the menu.
 
     @staticmethod
     def getDigits(string):
@@ -80,7 +83,17 @@ class Helper(object):
         :param string: A string containing regular notation integers and/or decimals.
         :return: The numbers in string format in a list.
         """
-        return re.findall(Helper.digits, string)
+        return re.findall(Helper.digits_pattern, string)
+
+    @staticmethod
+    def getPointIndex(pathString):
+        """
+        I
+        :param pathString:
+        :return:
+        """
+        return int(re.match(Helper.path_pattern, pathString).group(1)) - 1
+
 
     @staticmethod
     def generate_path_string(p1, p2, velocity, heading):
@@ -227,7 +240,7 @@ class Point(object):
         :param other: The next point in the list.
         :return: A string explaining the path taken between two points.
         """
-        return f'({self.x}, {self.y}) to ({other.x}, {other.y}) going {self.velocity} in/s at {self.turn}°'
+        return f'Path #{self.index + 1}: ({self.x}, {self.y}) to ({other.x}, {other.y}) going {self.velocity} in/s at {self.turn}°'
 
     def getTurnstring(self) -> str:
         """
