@@ -26,6 +26,8 @@ class Config(object):
         self.fieldInstance = None  # Field Instance for saving while leaving Studio Window temporarily
         self.hiddenStudio = False  # Whether or not the Studio Window is hidden temporarily
 
+        # large list of proprietary 'global' mimic vars
+        # ultimate goal is complete removal of these
         self.points = []  # A list of points representing the paths the robot takes in AutonStudio.
         self.turns = []
         self.velocities = []
@@ -52,9 +54,14 @@ class Config(object):
         self.pathStrings = [None]
         self.turnStrings = [None]
 
+        # Variables managing window events/values
+        # Stored here for cross-window access
         self.titleEvent, self.titleValues = None, None
         self.configEvent, self.configValues = None, None
         self.studioEvent, self.studioValues = None, None
+
+        # Variables used for tracking points
+        self.ppoints = []
 
 
 class Helper(object):
@@ -161,10 +168,10 @@ class Helper(object):
     @staticmethod
     def calculate_rotation_per_frame(points, angle1, angle2, degrees_per_second, frames_per_second):
         deltas = []
+        degrees_per_frame = degrees_per_second / frames_per_second
         for p in points:
             point_deltas = [[], []]
             delta_angle = float(angle2) - float(angle1)
-            degrees_per_frame = degrees_per_second / frames_per_second
             frame_count = abs(int(delta_angle / degrees_per_frame))
             current_angle = float(angle1)
             for i in range(0, frame_count):
@@ -190,7 +197,7 @@ class Point(object):
 
     def __init__(self, x: int, y: int, i: int):
         # basic Point attributes
-        self.x, self.y, self.index, self.turn, self.velocity = x, y, i, None, 42
+        self.x, self.y, self.index, self.turn, self.velocity = x, y, i, 0.0, 42
 
         # rendering attributes
         self.deleteMarker = None
@@ -203,6 +210,15 @@ class Point(object):
         :param action: The current action being taken by the User inside the Studio.
         """
         pass
+
+    def rotationScheme(self, angle: float, dps: int = 0, fps: int = 60):
+        """
+
+        :param angle: the angle the point should end upon.
+        :param dps: degrees per second
+        :param fps: frames per second
+        :return: A list of points
+        """
 
     def getPathstring(self, other) -> str:
         """
