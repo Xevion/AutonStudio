@@ -6,7 +6,7 @@ import logging
 import time
 
 from PySimpleGUI import Text, Button, Listbox, Column, Image, Window, Combo, Graph, InputText, Tab, TabGroup, theme, \
-    Popup, PopupGetText, PopupGetFolder, PopupYesNo
+    Popup, PopupGetText, PopupGetFolder, PopupYesNo, PopupGetFile
 
 from autonstudio import manage
 from autonstudio.enums import TitleEvents, ConfigEvents, StudioEvents
@@ -312,38 +312,38 @@ def main() -> None:
                     break
 
                 # Clears all field elements and paths
-                if event1 == '-CLEAR_FIELD_BUTTON-' and len(points) > 0:
-                    field.delete_figure(robot_rectangle)
-                    field.delete_figure(robot_polygon)
-                    field.delete_figure(robot_point)
-                    field.delete_figure(startPoint_circle)
-                    for tc in turn_circles:
+                if config.studioEvent == StudioEvents.CLEAR_FIELD_BUTTON and len(points) > 0:
+                    field.delete_figure(config.robot_rectangle)
+                    field.delete_figure(config.robot_polygon)
+                    field.delete_figure(config.robot_point)
+                    field.delete_figure(config.startPoint_circle)
+                    for tc in config.turn_circles:
                         field.delete_figure(tc)
-                    for tic in turnIndicator_circles:
+                    for tic in config.turnIndicator_circles:
                         field.delete_figure(tic)
                     field.delete_figure(startPoint_line)
-                    for pl in point_lines:
+                    for pl in config.point_lines:
                         field.delete_figure(pl)
-                    for tit in turnIndicator_text:
+                    for tit in config.turnIndicator_text:
                         field.delete_figure(tit)
-                    points.clear()
-                    point_lines.clear()
-                    turn_circles.clear()
-                    turnIndicator_circles.clear()
-                    turnIndicator_text.clear()
-                    turns.clear()
-                    convertedPoints.clear()
-                    pathStrings.clear()
-                    turnStrings.clear()
-                    fieldSave = None
+                    config.points.clear()
+                    config.point_lines.clear()
+                    config.turn_circles.clear()
+                    config.turnIndicator_circles.clear()
+                    config.turnIndicator_text.clear()
+                    config.turns.clear()
+                    config.convertedPoints.clear()
+                    config.pathStrings.clear()
+                    config.turnStrings.clear()
+                    config.fieldSave = None
 
                 # Choose which path to edit
-                if event1 == '-EDIT_PATH_BUTTON-':
+                if config.studioEvent == '-EDIT_PATH_BUTTON-':
                     counter = 0
                     pathEditUpdated = False
                     for p in pathStrings:
                         counter += 1
-                        if len(values1['-PATH_LIST-']) > 0 and values1['-PATH_LIST-'][0] == p:
+                        if len(config.studioValues['-PATH_LIST-']) > 0 and config.studioValues['-PATH_LIST-'][0] == p:
                             studioWindow['-PATH_INFO-'].update('Path #' + str(counter))
                             selectedPathNum = counter
 
@@ -357,102 +357,102 @@ def main() -> None:
                     studioWindow['-START_Y_INPUT-'].update(value=convertedPoints[selectedPathNum - 1][1])
                     studioWindow['-FINAL_X_INPUT-'].update(value=convertedPoints[selectedPathNum][0])
                     studioWindow['-FINAL_Y_INPUT-'].update(value=convertedPoints[selectedPathNum][1])
-                    studioWindow['-VELOCITY_INPUT-'].update(value=velocities[selectedPathNum - 1])
+                    studioWindow['-VELOCITY_INPUT-'].update(value=config.velocities[selectedPathNum - 1])
                     pathEditUpdated = True
                 # Change the values of a point based on what was entered into the entry field
                 if pathEditUpdated and config.studioEvent == StudioEvents.START_X_INPUT:
-                    points[selectedPathNum - 1][0] = float(
+                    config.points[selectedPathNum - 1][0] = float(
                         hf.clean_coordinates(config.studioValues['-START_X_INPUT-'])) * 5 + (720 / 2)
-                    elif event1 == '-START_Y_INPUT-':
-                        points[selectedPathNum - 1][1] = float(
+                    elif config.studioEvent == '-START_Y_INPUT-':
+                        config.points[selectedPathNum - 1][1] = float(
                             hf.clean_coordinates(config.studioValues['-START_Y_INPUT-'])) * 5 + (
                                                                  720 / 2)
-                    elif event1 == '-FINAL_X_INPUT-':
-                        points[selectedPathNum][0] = float(hf.clean_coordinates(config.studioValues['-FINAL_X_INPUT-'])) * 5 + (
+                    elif config.studioEvent == '-FINAL_X_INPUT-':
+                        config.points[selectedPathNum][0] = float(hf.clean_coordinates(config.studioValues[StudioEvents.FINAL_X_INPUT])) * 5 + (
                                     720 / 2)
-                    elif event1 == '-FINAL_Y_INPUT-':
-                        points[selectedPathNum][1] = float(hf.clean_coordinates(config.studioValues['-FINAL_Y_INPUT-'])) * 5 + (
+                    elif config.studioEvent == '-FINAL_Y_INPUT-':
+                        config.points[selectedPathNum][1] = float(hf.clean_coordinates(config.studioValues[StudioEvents.FINAL_Y_INPUT])) * 5 + (
                                     720 / 2)
-                    elif event1 == '-VELOCITY_INPUT-':
-                        velocities[selectedPathNum - 1] = float(hf.clean_coordinates(config.studioValues['-VELOCITY_INPUT-']))
+                    elif config.studioEvent == '-VELOCITY_INPUT-':
+                        config.velocities[selectedPathNum - 1] = float(hf.clean_coordinates(config.studioValues[StudioEvents.VELOCITY_INPUT]))
 
                 # Rounds all the points to the nearest inch
-                if event1 == '-ROUND_ALL_BUTTON-':
+                if config.studioEvent == StudioEvents.ROUND_ALL_BUTTON:
                     for i in range(0, len(convertedPoints)):
-                        points[i][0] = round(convertedPoints[i][0]) * 5 + (720 / 2)
-                        points[i][1] = round(convertedPoints[i][1]) * 5 + (720 / 2)
+                        config.points[i][0] = round(convertedPoints[i][0]) * 5 + (720 / 2)
+                        config.points[i][1] = round(convertedPoints[i][1]) * 5 + (720 / 2)
 
                 # Deselect the current path
-                if event1 == '-DESELECT_BUTTON-':
+                if config.studioEvent == '-DESELECT_BUTTON-':
                     selectedPathNum = None
                 if selectedPathNum is None:
-                    studioWindow['-PATH_INFO-'].update('None')
-                    studioWindow['-START_X_TEXT-'].hide_row()
-                    studioWindow['-FINAL_X_TEXT-'].hide_row()
-                    studioWindow['-DESELECT_BUTTON-'].hide_row()
-                    studioWindow['-VELOCITY_INPUT-'].hide_row()
+                    studioWindow[StudioEvents.PATH_INFO].update('None')
+                    studioWindow[StudioEvents.START_X_TEXT].hide_row()
+                    studioWindow[StudioEvents.FINAL_X_INPUT].hide_row()
+                    studioWindow[StudioEvents.DESELECT_BUTTON].hide_row()
+                    studioWindow[StudioEvents.VELOCITY_INPUT].hide_row()
 
                 # Choose which turn to edit
-                if event1 == '-EDIT_TURN_BUTTON-':
+                if config.studioEvent == StudioEvents.EDIT_TURN_BUTTON:
                     counter = 0
                     turnEditUpdated = False
                     for t in turnStrings:
                         counter += 1
-                        if len(config.studioValues['-TURN_LIST-']) > 0 and config.studioValues['-TURN_LIST-'][0] == t:
-                            studioWindow['-TURN_INFO-'].update('Turn #' + str(counter))
+                        if len(config.studioValues[StudioEvents.TURN_LIST]) > 0 and config.studioValues[StudioEvents.TURN_LIST][0] == t:
+                            studioWindow[StudioEvents.TURN_INFO].update('Turn #' + str(counter))
                             selectedTurnNum = counter
 
                 if selectedTurnNum is None:
-                    studioWindow['-ANGLE_TEXT-'].hide_row()
-                    studioWindow['-TURN_INFO-'].update('None')
+                    studioWindow[StudioEvents.ANGLE_TEXT].hide_row()
+                    studioWindow[StudioEvents.TURN_INFO].update('None')
                 # Show the entry fields for editing the turn
                 if selectedTurnNum is not None and not turnEditUpdated:
-                    studioWindow['-ANGLE_TEXT-'].unhide_row()
-                    studioWindow['-ANGLE_INPUT-'].update(value=turns[selectedTurnNum - 1][1])
+                    studioWindow[StudioEvents.ANGLE_TEXT].unhide_row()
+                    studioWindow[StudioEvents.ANGLE_INPUT].update(value=turns[selectedTurnNum - 1][1])
                     turnEditUpdated = True
                 # Change the angle value of a turn based on what was entered into the entry field
                 if turnEditUpdated:
-                    if event1 == '-ANGLE_INPUT-':
-                        turns[selectedTurnNum - 1][1] = float(hf.clean_coordinates(config.studioValues['-ANGLE_INPUT-']))
+                    if event1 == StudioEvents.ANGLE_INPUT:
+                        turns[selectedTurnNum - 1][1] = float(hf.clean_coordinates(config.studioValues[StudioEvents.ANGLE_INPUT]))
 
                 # Select start point and draw the circle for it and add it to points
-                if event1 == '-START_POINT_BUTTON-':
+                if event1 == StudioEvents.START_POINT_BUTTON:
                     selectedOperation = 'selectingStartPoint'
                 if selectedOperation == 'selectingStartPoint':
-                    if event1 == '-FIELD-':
+                    if event1 == StudioEvents.FIELD:
                         field.delete_figure(startPoint_circle)
-                        startPoint_circle = field.draw_circle([config.studioValues['-FIELD-'][0], config.studioValues['-FIELD-'][1]], 5)
-                        if len(points) > 0:
-                            points[0] = ([config.studioValues['-FIELD-'][0], config.studioValues['-FIELD-'][1]])
+                        startPoint_circle = field.draw_circle([config.studioValues[StudioEvents.FIELD][0], config.studioValues[StudioEvents.FIELD][1]], 5)
+                        if len(config.points) > 0:
+                            config.points[0] = ([config.studioValues[StudioEvents.FIELD][0], config.studioValues[StudioEvents.FIELD][1]])
                         else:
-                            points.append([config.studioValues['-FIELD-'][0], config.studioValues['-FIELD-'][1]])
-                        startHeading = float(hf.clean_coordinates(sg.PopupGetText(
+                            config.points.append([config.studioValues[StudioEvents.FIELD][0], config.studioValues[StudioEvents.FIELD][1]])
+                        startHeading = float(hf.clean_coordinates(PopupGetText(
                             message='Enter start heading, 0 is straight up, 90 is to the right, -90 is to the left',
                             title='Heading selection')))
                         selectedOperation = None
 
                 # Select next point and and it to list of points
-                if event1 == '-ADD_POINT_BUTTON-' and len(points) > 0:
+                if config.studioEvent == StudioEvents.ADD_POINT_BUTTON and len(config.points) > 0:
                     selectedOperation = 'addingPoint'
                 if selectedOperation == 'addingPoint':
-                    if event1 == '-FIELD-':
-                        points.append([config.studioValues['-FIELD-'][0], config.studioValues['-FIELD-'][1]])
-                        velocities.append(defaultVelocity)
+                    if config.studioEvent ==StudioEvents.FIELD:
+                        config.points.append([config.studioValues[StudioEvents.FIELD][0], config.studioValues[StudioEvents.FIELD][1]])
+                        config.velocities.append(config.defaultVelocity)
                         selectedOperation = None
 
-                if event1 == '-DELETE_POINT_BUTTON-' and len(points) > 0:
+                if config.studioEvent == StudioEvents.DELETE_POINT_BUTTON and len(config.points) > 0:
                     selectedOperation = 'deletingPoint'
                 if selectedOperation == 'deletingPoint':
                     selectedTurnNum = None
                     selectedPathNum = None
                     if len(delete_point_circles) == 0:
-                        for p in points[1:]:
+                        for p in config.points[1:]:
                             delete_point_circles.append(field.draw_circle(p, 10, fill_color='red'))
-                    if event1 == '-FIELD-':
-                        for p in points[1:]:
-                            if abs(config.studioValues['-FIELD-'][0] - p[0]) < 10 and abs(config.studioValues['-FIELD-'][1] - p[1]) < 10:
-                                indx = points.index(p)
-                                points.remove(p)
+                    if event1 == StudioEvents.FIELD:
+                        for p in config.points[1:]:
+                            if abs(config.studioValues[StudioEvents.FIELD][0] - p[0]) < 10 and abs(config.studioValues[StudioEvents.FIELD][1] - p[1]) < 10:
+                                indx = config.points.index(p)
+                                config.points.remove(p)
                                 turn_to_remove = None
                                 for t in turns:
                                     if indx == t[0]:
@@ -468,7 +468,7 @@ def main() -> None:
                             field.delete_figure(c)
                         delete_point_circles.clear()
 
-                if event1 == '-DELETE_TURN_BUTTON-' and len(turns) > 0:
+                if config.studioEvent == StudioEvents.DELETE_TURN_BUTTON and len(turns) > 0:
                     selectedOperation = 'deletingTurn'
                 if selectedOperation == 'deletingTurn':
                     selectedTurnNum = None
@@ -490,31 +490,31 @@ def main() -> None:
                         delete_turn_circles.clear()
 
                 # Select a spot to add a turn and add it to list of turns
-                if event1 == '-ADD_TURN_BUTTON-':
+                if config.studioEvent == StudioEvents.ADD_TURN_BUTTON:
                     selectedOperation = 'addingTurn'
                 if selectedOperation == 'addingTurn':
-                    if len(turn_circles) == 0:
-                        for i in range(0, len(points)):
+                    if len(config.turn_circles) == 0:
+                        for i in range(0, len(config.points)):
                             drawCircle = True
                             for t in turns:
                                 if t[0] == i:
                                     drawCircle = False
                             if drawCircle:
-                                turn_circles.append(field.draw_circle(points[i], 10, fill_color='black'))
+                                config.turn_circles.append(field.draw_circle(config.points[i], 10, fill_color='black'))
                     if event1 == '-FIELD-':
-                        for i in range(0, len(points)):
+                        for i in range(0, len(config.points)):
                             allowPointToBeSelected = True
                             for t in turns:
                                 if t[0] == i:
                                     allowPointToBeSelected = False
-                            if abs(values1['-FIELD-'][0] - points[i][0]) < 10 and abs(
-                                    values1['-FIELD-'][1] - points[i][1]) < 10 and allowPointToBeSelected:
-                                angle = sg.PopupGetText('Enter turn angle in degrees', title='Turn Angle Entry')
+                            if abs(config.studioValues[StudioEvents.FIELD][0] - config.points[i][0]) < 10 and abs(
+                                    config.studioValues['-FIELD-'][1] - config.points[i][1]) < 10 and allowPointToBeSelected:
+                                angle = PopupGetText('Enter turn angle in degrees', title='Turn Angle Entry')
                                 if angle is not None:
                                     turns.append([i, hf.clean_coordinates(angle)])
                                     selectedOperation = None
                                 else:
-                                    sg.PopupAnnoying('ERROR: Please enter a value')
+                                    PopupAnnoying('ERROR: Please enter a value')
                 if not selectedOperation == 'addingTurn':
                     if len(turn_circles) > 0:
                         for c in turn_circles:
@@ -522,7 +522,7 @@ def main() -> None:
                         turn_circles.clear()
 
                 # Simulate the robot running through the path
-                if event1 == '-SIMULATE_BUTTON-':
+                if config.studioEvent == StudioEvents.SIMULATE_BUTTON:
                     selectedOperation = 'simulating'
                 if selectedOperation == 'simulating':
                     prevTurn = None
@@ -587,6 +587,7 @@ def main() -> None:
                                     studioWindow.refresh()
                                     sleepTime = max(0, 1 / 60 - (time.time() - start_time)
                                     time.sleep(sleepTime)
+
                         for j in range(0, int(num_movements)):
                             start_time = time.time()
                             x += deltas[0]
@@ -609,7 +610,7 @@ def main() -> None:
                                 robotPoint = [((robotCTr[0] + robotCTl[0]) / 2.0),
                                               ((robotCTr[1] + robotCTl[1]) / 2.0)]
                             robot_point = field.draw_point(point=robotPoint, color='yellow', size=15)
-                            studio_window.refresh()
+                            studioWindow.refresh()
                             sleepTime = 1 / 60 - (time.time() - start_time)
                             if sleepTime < 0:
                                 sleepTime = 0
@@ -617,10 +618,10 @@ def main() -> None:
                     selectedOperation = None
 
                 if config.studioEvent == StudioEvents.EXPORT_BUTTON:
-                    if len(convertedPoints) > 0:
+                    if len(config.convertedPoints) > 0:
                         export_location = ''
                         while export_location == '':
-                            export_location = sg.PopupGetFolder('Choose Export Location')
+                            export_location = PopupGetFolder('Choose Export Location')
                         if export_location is not None:
                             export_location = export_location + '/AutonPath.java'
                             export_file = open(export_location, 'w')
@@ -635,7 +636,7 @@ def main() -> None:
                             export_string += '}\n\n'
                             export_string += 'public void drive(){\n'
                             heading = startHeading
-                            for i in range(1, len(points)):
+                            for i in range(1, len(config.points)):
                                 for t in turns:
                                     if t[0] == i - 1:
                                         export_string += f'turn({t[1]},TURN_SPEED,positioning);\n'
@@ -672,7 +673,7 @@ def main() -> None:
                         config.points.clear()
                         turns.clear()
                         config.velocities.clear()
-                        save_location = sg.PopupGetFile('Hello', no_window=True,
+                        save_location = PopupGetFile('Hello', no_window=True,
                                                         file_types=(("Auton Files", "*.auton"),))
                         save_file = open(save_location, 'r')
                         num_points = int(save_file.readline())
