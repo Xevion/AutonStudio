@@ -10,7 +10,7 @@ from PySimpleGUI import Text, Button, Listbox, Column, Image, Window, Combo, Gra
     Popup, PopupGetText, PopupGetFolder, PopupYesNo, PopupGetFile, PopupAnnoying
 
 from autonstudio import manage
-from autonstudio.enums import TitleEvents, ConfigEvents, StudioEvents
+from autonstudio.enums import TitleEvents, ConfigEvents, StudioEvents, StudioActions
 from autonstudio.exceptions import InvalidRobotDimensions
 
 logging.basicConfig(
@@ -425,10 +425,10 @@ def main() -> None:
 
                 # Select start point and draw the circle for it and add it to points
                 if config.studioEvent == StudioEvents.START_POINT_BUTTON:
-                    config.selectedOperation = 'selectingStartPoint'
+                    config.selectedOperation = StudioActions.ADD_START_POINT
 
                 # selectStartPoint op handling
-                if config.selectedOperation == 'selectingStartPoint':
+                if config.selectedOperation == StudioActions.ADD_START_POINT:
                     # If the user clicked on the field
                     if config.studioEvent == StudioEvents.FIELD:
                         field.delete_figure(config.startPoint_circle)
@@ -436,7 +436,7 @@ def main() -> None:
                             [config.studioValues[StudioEvents.FIELD][0], config.studioValues[StudioEvents.FIELD][1]], 5)
                         # handling for when start point is not already picked
                         if len(config.points) == 0:
-                            config.points[0] = None
+                            config.points.append(None)
                         config.points[0] = [config.studioValues[StudioEvents.FIELD][0],
                                                   config.studioValues[StudioEvents.FIELD][1]]
                         config.startHeading = float(manage.Helper.clean_coordinates(PopupGetText(
@@ -446,9 +446,9 @@ def main() -> None:
 
                 # Select next point and and it to list of points
                 if config.studioEvent == StudioEvents.ADD_POINT_BUTTON and len(config.points) > 0:
-                    config.selectedOperation = 'addingPoint'
+                    config.selectedOperation = StudioActions.ADD_POINT
 
-                if config.selectedOperation == 'addingPoint':
+                if config.selectedOperation == StudioActions.ADD_POINT:
                     # Add a point where the user clicked on the end of the path
                     if config.studioEvent == StudioEvents.FIELD:
                         config.points.append(
@@ -458,10 +458,10 @@ def main() -> None:
 
                 # Delete Point button handling
                 if config.studioEvent == StudioEvents.DELETE_POINT_BUTTON and len(config.points) > 0:
-                    config.selectedOperation = 'deletingPoint'
+                    config.selectedOperation = StudioActions.DELETE_POINT
 
                 # Point Deletion Handling
-                if config.selectedOperation == 'deletingPoint':
+                if config.selectedOperation == StudioActions.DELETE_POINT:
                     config.selectedTurnNum = None
                     config.selectedPathNum = None
 
@@ -488,7 +488,7 @@ def main() -> None:
                                 config.selectedOperation = None
 
                 # Delete DelPoint markers if current action is not point deletion
-                if not config.selectedOperation == 'deletingPoint':
+                if not config.selectedOperation == StudioActions.DELETE_POINT:
                     if len(config.delete_point_circles) > 0:
                         for delTurnCircle in config.delete_point_circles:
                             field.delete_figure(delTurnCircle)
@@ -496,10 +496,10 @@ def main() -> None:
 
                 # Delete Turn button handling
                 if config.studioEvent == StudioEvents.DELETE_TURN_BUTTON and len(config.turns) > 0:
-                    config.selectedOperation = 'deletingTurn'
+                    config.selectedOperation = StudioActions.DELETE_TURN
 
                 # If Turn Deletion is ready
-                if config.selectedOperation == 'deletingTurn':
+                if config.selectedOperation == StudioActions.DELETE_TURN:
                     config.selectedTurnNum = None
                     config.selectedPathNum = None
 
@@ -518,7 +518,7 @@ def main() -> None:
                                 config.selectedOperation = None
 
                 # Delete turn-delete-markers if the current operation is not turn deletion
-                if not config.selectedOperation == 'deletingTurn':
+                if not config.selectedOperation == StudioActions.DELETE_TURN:
                     print(f'Delete Turn Circles: {len(config.delete_turn_circles)})')
                     if len(config.delete_turn_circles) > 0:
                         for delTurnCircle in config.delete_turn_circles:
@@ -527,10 +527,11 @@ def main() -> None:
 
                 # Select a spot to add a turn and add it to list of turns
                 if config.studioEvent == StudioEvents.ADD_TURN_BUTTON:
-                    config.selectedOperation = 'addingTurn'
+                    config.selectedOperation = StudioActions.ADD_TURN
 
                 # If current action is addingTurn
-                if config.selectedOperation == 'addingTurn':
+                print(config.selectedOperation )
+                if config.selectedOperation == StudioActions.ADD_TURN:
                     # Turn Circle Drawing
                     if len(config.turn_circles) == 0:
                         for i in range(0, len(config.points)):
@@ -559,7 +560,7 @@ def main() -> None:
                                     PopupAnnoying('ERROR: Please enter a value')
 
                 # Delete TurnCircle figures if we're not using them
-                if not config.selectedOperation == 'addingTurn':
+                if config.selectedOperation != StudioActions.DELETE_TURN:
                     if len(config.turn_circles) > 0:
                         for delTurnCircle in config.turn_circles:
                             field.delete_figure(delTurnCircle)
@@ -567,8 +568,8 @@ def main() -> None:
 
                 # Simulate the robot running through the path
                 if config.studioEvent == StudioEvents.SIMULATE_BUTTON:
-                    config.selectedOperation = 'simulating'
-                if config.selectedOperation == 'simulating':
+                    config.selectedOperation = StudioActions.SIMULATE
+                if config.selectedOperation == StudioActions.SIMULATE:
                     prevTurn = None
                     robotCBr = [45, -45]  # Bottom right corner and go clockwise
                     robotCBl = [-45, -45]
