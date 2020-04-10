@@ -187,8 +187,12 @@ class Point(object):
     """
 
     def __init__(self, x: int, y: int, i: int):
-        self.x, self.y, self.index = x, y, i
-        self.turn = None
+        # basic Point attributes
+        self.x, self.y, self.index, self.turn, self.velocity = x, y, i, None, 42
+
+        # rendering attributes
+        self.deleteMarker = None
+        self.turnIndicator = None
 
     def render(self, field: Graph, action: None) -> None:
         """
@@ -197,6 +201,23 @@ class Point(object):
         :param action: The current action being taken by the User inside the Studio.
         """
         pass
+
+    def getPathstring(self, other) -> str:
+        """
+        Generates a string for the GUI to use in the Paths List.
+
+        :param other: The next point in the list.
+        :return: A string explaining the path taken between two points.
+        """
+        return f'({self.x}, {self.y}) to ({other.x}, {other.y}) going {self.velocity} in/s at {self.turn}°'
+
+    def getTurnstring(self) -> str:
+        """
+        Generates a Turn String if a turn is being made. Otherwise raises an exception.
+        :return: A string explaining the turn being taken at this point.
+        """
+        if self.turn is not None:
+            return f'Turn to {self.turn} ° at ({self.x}, {self.y})'
 
     def isClicked(self, x, y):
         """
