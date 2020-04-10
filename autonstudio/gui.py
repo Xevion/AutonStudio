@@ -656,8 +656,8 @@ def main() -> None:
                         save_location = save_location + '/' + save_name + '.auton'
                         save_file = open(save_location, 'w')
                         save_string = ''
-                        save_string += str(len(points)) + '\n'
-                        for p in points:
+                        save_string += str(len(config.points)) + '\n'
+                        for p in config.points:
                             save_string += f'{p[0]} {p[1]}\n'
                         save_string += str(len(turns)) + '\n'
                         for t in turns:
@@ -669,9 +669,9 @@ def main() -> None:
                     choice = PopupYesNo(
                         'Do you want to load a save?\nYou will lose any unsaved progress if you do so.')
                     if choice == 'Yes':
-                        points.clear()
+                        config.points.clear()
                         turns.clear()
-                        velocities.clear()
+                        config.velocities.clear()
                         save_location = sg.PopupGetFile('Hello', no_window=True,
                                                         file_types=(("Auton Files", "*.auton"),))
                         save_file = open(save_location, 'r')
@@ -713,15 +713,15 @@ def main() -> None:
                 studioWindow[StudioEvents.TURN_LIST].update(values=turnStrings)
 
                 # Draw turn indicators
-                for i in range(len(turnIndicator_circles)):
-                    field.delete_figure(turnIndicator_circles[i])
-                    field.delete_figure(turnIndicator_text[i])
+                for i in range(len(config.turnIndicator_circles)):
+                    field.delete_figure(config.turnIndicator_circles[i])
+                    field.delete_figure(config.turnIndicator_text[i])
                 for i in range(0, len(turns)):
-                    if len(turnIndicator_circles) < i + 1:
-                        turnIndicator_circles.append(None)
-                        turnIndicator_text.append(None)
-                    turnIndicator_circles[i] = field.draw_circle(config.points[turns[i][0]], 5, fill_color='black')
-                    turnIndicator_text[i] = field.draw_text(text=str(turns[i][1]) + '°',
+                    if len(config.turnIndicator_circles) < i + 1:
+                        config.turnIndicator_circles.append(None)
+                        config.turnIndicator_text.append(None)
+                    config.turnIndicator_circles[i] = field.draw_circle(config.points[turns[i][0]], 5, fill_color='black')
+                    config.turnIndicator_text[i] = field.draw_text(text=str(turns[i][1]) + '°',
                                                             location=[config.points[turns[i][0]][0] + 10,
                                                                       config.points[turns[i][0]][1] + 10],
                                                             color='dark blue')

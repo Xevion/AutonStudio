@@ -6,6 +6,8 @@ and allow for a overall simpler to debug and manage application.
 
 import re
 
+from PySimpleGUI import Graph
+
 
 class Config(object):
     """
@@ -29,6 +31,8 @@ class Config(object):
         self.point_lines = []
         self.turn_circles = []
         self.convertedPoints = []
+        self.turnIndicator_circles = []
+        self.turnIndicator_text = []
 
         self.titleEvent, self.titleValues = None, None
         self.configEvent, self.configValues = None, None
@@ -53,3 +57,24 @@ class Helper(object):
         """
         return re.findall(Helper.digits, string)
 
+
+class Point(object):
+    """
+    A advanced class that manages points along a path built inside AutonStudio.
+    Manages field rendering, assists with calculations, text generation and more.
+    """
+
+    def __init__(self, x: int, y: int):
+        self.x, self.y = x, y
+        self.turn = None
+
+    def render(self, field: Graph, action: None) -> None:
+        """
+        Renders the point (and associated turns) on the field, deleting it if it was rendered.
+        :param field: A field object.
+        :param action: The current action being taken by the User inside the Studio.
+        """
+        pass
+
+    def __repr__(self):
+        return f'Path({self.x}, {self.y})'
