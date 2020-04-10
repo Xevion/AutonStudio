@@ -22,6 +22,14 @@ class Config(object):
         self.fieldInstance = None  # Field Instance for saving while leaving Studio Window temporarily
         self.hiddenStudio = False  # Whether or not the Studio Window is hidden temporarily
 
+        self.points = []  # A list of points representing the paths the robot takes in AutonStudio.
+        self.turns = []
+        self.velocities = []
+        self.defaultVelocity = 48
+        self.point_lines = []
+        self.turn_circles = []
+        self.convertedPoints = []
+
         self.titleEvent, self.titleValues = None, None
         self.configEvent, self.configValues = None, None
         self.studioEvent, self.studioValues = None, None

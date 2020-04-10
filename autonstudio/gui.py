@@ -3,8 +3,10 @@ This file controls all GUI operations, and acts as the heart of the program with
 """
 
 import logging
+import time
 
-from PySimpleGUI import Text, Button, Listbox, Column, Image, Window, Combo, Graph, InputText, Tab, TabGroup, theme
+from PySimpleGUI import Text, Button, Listbox, Column, Image, Window, Combo, Graph, InputText, Tab, TabGroup, theme, \
+    Popup, PopupGetText, PopupGetFolder, PopupYesNo
 
 from autonstudio import manage
 from autonstudio.enums import TitleEvents, ConfigEvents, StudioEvents
@@ -342,37 +344,37 @@ def main() -> None:
                     for p in pathStrings:
                         counter += 1
                         if len(values1['-PATH_LIST-']) > 0 and values1['-PATH_LIST-'][0] == p:
-                            studio_window['-PATH_INFO-'].update('Path #' + str(counter))
+                            studioWindow['-PATH_INFO-'].update('Path #' + str(counter))
                             selectedPathNum = counter
 
                 # Show the entry fields for editing the path
                 if selectedPathNum is not None and not pathEditUpdated:
-                    studio_window[StudioEvents.START_X_TEXT].unhide_row()
-                    studio_window['-FINAL_X_TEXT-'].unhide_row()
-                    studio_window['-VELOCITY_INPUT-'].unhide_row()
-                    studio_window['-DESELECT_BUTTON-'].unhide_row()
-                    studio_window['-START_X_INPUT-'].update(value=convertedPoints[selectedPathNum - 1][0])
-                    studio_window['-START_Y_INPUT-'].update(value=convertedPoints[selectedPathNum - 1][1])
-                    studio_window['-FINAL_X_INPUT-'].update(value=convertedPoints[selectedPathNum][0])
-                    studio_window['-FINAL_Y_INPUT-'].update(value=convertedPoints[selectedPathNum][1])
-                    studio_window['-VELOCITY_INPUT-'].update(value=velocities[selectedPathNum - 1])
+                    studioWindow[StudioEvents.START_X_TEXT].unhide_row()
+                    studioWindow['-FINAL_X_TEXT-'].unhide_row()
+                    studioWindow['-VELOCITY_INPUT-'].unhide_row()
+                    studioWindow['-DESELECT_BUTTON-'].unhide_row()
+                    studioWindow['-START_X_INPUT-'].update(value=convertedPoints[selectedPathNum - 1][0])
+                    studioWindow['-START_Y_INPUT-'].update(value=convertedPoints[selectedPathNum - 1][1])
+                    studioWindow['-FINAL_X_INPUT-'].update(value=convertedPoints[selectedPathNum][0])
+                    studioWindow['-FINAL_Y_INPUT-'].update(value=convertedPoints[selectedPathNum][1])
+                    studioWindow['-VELOCITY_INPUT-'].update(value=velocities[selectedPathNum - 1])
                     pathEditUpdated = True
                 # Change the values of a point based on what was entered into the entry field
                 if pathEditUpdated and config.studioEvent == StudioEvents.START_X_INPUT:
                     points[selectedPathNum - 1][0] = float(
-                        hf.clean_coordinates(values1['-START_X_INPUT-'])) * 5 + (720 / 2)
+                        hf.clean_coordinates(config.studioValues['-START_X_INPUT-'])) * 5 + (720 / 2)
                     elif event1 == '-START_Y_INPUT-':
                         points[selectedPathNum - 1][1] = float(
-                            hf.clean_coordinates(values1['-START_Y_INPUT-'])) * 5 + (
+                            hf.clean_coordinates(config.studioValues['-START_Y_INPUT-'])) * 5 + (
                                                                  720 / 2)
                     elif event1 == '-FINAL_X_INPUT-':
-                        points[selectedPathNum][0] = float(hf.clean_coordinates(values1['-FINAL_X_INPUT-'])) * 5 + (
+                        points[selectedPathNum][0] = float(hf.clean_coordinates(config.studioValues['-FINAL_X_INPUT-'])) * 5 + (
                                     720 / 2)
                     elif event1 == '-FINAL_Y_INPUT-':
-                        points[selectedPathNum][1] = float(hf.clean_coordinates(values1['-FINAL_Y_INPUT-'])) * 5 + (
+                        points[selectedPathNum][1] = float(hf.clean_coordinates(config.studioValues['-FINAL_Y_INPUT-'])) * 5 + (
                                     720 / 2)
                     elif event1 == '-VELOCITY_INPUT-':
-                        velocities[selectedPathNum - 1] = float(hf.clean_coordinates(values1['-VELOCITY_INPUT-']))
+                        velocities[selectedPathNum - 1] = float(hf.clean_coordinates(config.studioValues['-VELOCITY_INPUT-']))
 
                 # Rounds all the points to the nearest inch
                 if event1 == '-ROUND_ALL_BUTTON-':
@@ -384,11 +386,11 @@ def main() -> None:
                 if event1 == '-DESELECT_BUTTON-':
                     selectedPathNum = None
                 if selectedPathNum is None:
-                    studio_window['-PATH_INFO-'].update('None')
-                    studio_window['-START_X_TEXT-'].hide_row()
-                    studio_window['-FINAL_X_TEXT-'].hide_row()
-                    studio_window['-DESELECT_BUTTON-'].hide_row()
-                    studio_window['-VELOCITY_INPUT-'].hide_row()
+                    studioWindow['-PATH_INFO-'].update('None')
+                    studioWindow['-START_X_TEXT-'].hide_row()
+                    studioWindow['-FINAL_X_TEXT-'].hide_row()
+                    studioWindow['-DESELECT_BUTTON-'].hide_row()
+                    studioWindow['-VELOCITY_INPUT-'].hide_row()
 
                 # Choose which turn to edit
                 if event1 == '-EDIT_TURN_BUTTON-':
@@ -396,22 +398,22 @@ def main() -> None:
                     turnEditUpdated = False
                     for t in turnStrings:
                         counter += 1
-                        if len(values1['-TURN_LIST-']) > 0 and values1['-TURN_LIST-'][0] == t:
-                            studio_window['-TURN_INFO-'].update('Turn #' + str(counter))
+                        if len(config.studioValues['-TURN_LIST-']) > 0 and config.studioValues['-TURN_LIST-'][0] == t:
+                            studioWindow['-TURN_INFO-'].update('Turn #' + str(counter))
                             selectedTurnNum = counter
 
                 if selectedTurnNum is None:
-                    studio_window['-ANGLE_TEXT-'].hide_row()
-                    studio_window['-TURN_INFO-'].update('None')
+                    studioWindow['-ANGLE_TEXT-'].hide_row()
+                    studioWindow['-TURN_INFO-'].update('None')
                 # Show the entry fields for editing the turn
                 if selectedTurnNum is not None and not turnEditUpdated:
-                    studio_window['-ANGLE_TEXT-'].unhide_row()
-                    studio_window['-ANGLE_INPUT-'].update(value=turns[selectedTurnNum - 1][1])
+                    studioWindow['-ANGLE_TEXT-'].unhide_row()
+                    studioWindow['-ANGLE_INPUT-'].update(value=turns[selectedTurnNum - 1][1])
                     turnEditUpdated = True
                 # Change the angle value of a turn based on what was entered into the entry field
                 if turnEditUpdated:
                     if event1 == '-ANGLE_INPUT-':
-                        turns[selectedTurnNum - 1][1] = float(hf.clean_coordinates(values1['-ANGLE_INPUT-']))
+                        turns[selectedTurnNum - 1][1] = float(hf.clean_coordinates(config.studioValues['-ANGLE_INPUT-']))
 
                 # Select start point and draw the circle for it and add it to points
                 if event1 == '-START_POINT_BUTTON-':
@@ -419,11 +421,11 @@ def main() -> None:
                 if selectedOperation == 'selectingStartPoint':
                     if event1 == '-FIELD-':
                         field.delete_figure(startPoint_circle)
-                        startPoint_circle = field.draw_circle([values1['-FIELD-'][0], values1['-FIELD-'][1]], 5)
+                        startPoint_circle = field.draw_circle([config.studioValues['-FIELD-'][0], config.studioValues['-FIELD-'][1]], 5)
                         if len(points) > 0:
-                            points[0] = ([values1['-FIELD-'][0], values1['-FIELD-'][1]])
+                            points[0] = ([config.studioValues['-FIELD-'][0], config.studioValues['-FIELD-'][1]])
                         else:
-                            points.append([values1['-FIELD-'][0], values1['-FIELD-'][1]])
+                            points.append([config.studioValues['-FIELD-'][0], config.studioValues['-FIELD-'][1]])
                         startHeading = float(hf.clean_coordinates(sg.PopupGetText(
                             message='Enter start heading, 0 is straight up, 90 is to the right, -90 is to the left',
                             title='Heading selection')))
@@ -434,7 +436,7 @@ def main() -> None:
                     selectedOperation = 'addingPoint'
                 if selectedOperation == 'addingPoint':
                     if event1 == '-FIELD-':
-                        points.append([values1['-FIELD-'][0], values1['-FIELD-'][1]])
+                        points.append([config.studioValues['-FIELD-'][0], config.studioValues['-FIELD-'][1]])
                         velocities.append(defaultVelocity)
                         selectedOperation = None
 
@@ -448,7 +450,7 @@ def main() -> None:
                             delete_point_circles.append(field.draw_circle(p, 10, fill_color='red'))
                     if event1 == '-FIELD-':
                         for p in points[1:]:
-                            if abs(values1['-FIELD-'][0] - p[0]) < 10 and abs(values1['-FIELD-'][1] - p[1]) < 10:
+                            if abs(config.studioValues['-FIELD-'][0] - p[0]) < 10 and abs(config.studioValues['-FIELD-'][1] - p[1]) < 10:
                                 indx = points.index(p)
                                 points.remove(p)
                                 turn_to_remove = None
@@ -544,8 +546,7 @@ def main() -> None:
                             (points[i][0] - points[i - 1][0]) ** 2 + (
                                         points[i][1] - points[i - 1][1]) ** 2) / math.hypot(
                             deltas[0], deltas[1])
-                        x = points[i - 1][0]
-                        y = points[i - 1][1]
+                        x, y = points[i - 1]
                         for t in turns:
                             if t[0] == i - 1:
                                 if prevTurn is None:
@@ -583,10 +584,8 @@ def main() -> None:
                                          ((robotCTr[1] + robotCBr[1]) / 2.0) - 20]]
                                     robot_point = field.draw_point(point=robotLinePoints[0], color='yellow',
                                                                    size=15)
-                                    studio_window.refresh()
-                                    sleepTime = 1 / 60 - (time.time() - start_time)
-                                    if sleepTime < 0:
-                                        sleepTime = 0
+                                    studioWindow.refresh()
+                                    sleepTime = max(0, 1 / 60 - (time.time() - start_time)
                                     time.sleep(sleepTime)
                         for j in range(0, int(num_movements)):
                             start_time = time.time()
@@ -617,7 +616,7 @@ def main() -> None:
                             time.sleep(sleepTime)
                     selectedOperation = None
 
-                if event1 == '-EXPORT_BUTTON-':
+                if config.studioEvent == StudioEvents.EXPORT_BUTTON:
                     if len(convertedPoints) > 0:
                         export_location = ''
                         while export_location == '':
@@ -644,16 +643,16 @@ def main() -> None:
                                 export_string += f'driveToPosition({convertedPoints[i][0]},{convertedPoints[i][1]},DRIVE_SPEED,{heading},0,0,positioning,sensing);\n'
                             export_string += '}}'
                             export_file.write(export_string)
-                            sg.Popup('Export Successful!')
+                            Popup('Export Successful!')
                     else:
-                        sg.Popup('No Paths to Export')
+                        Popup('No Paths to Export')
 
-                if event1 == '-SAVE_BUTTON-':
+                if config.studioEvent == StudioEvents.SAVE_BUTTON:
                     save_name = ''
                     while save_name == '':
-                        save_name = sg.PopupGetText('Name:')
+                        save_name = PopupGetText('Name:')
                     if save_name is not None:
-                        save_location = sg.PopupGetFolder('', no_window=True)
+                        save_location = PopupGetFolder('', no_window=True)
                         save_location = save_location + '/' + save_name + '.auton'
                         save_file = open(save_location, 'w')
                         save_string = ''
@@ -667,7 +666,7 @@ def main() -> None:
                         save_file.close()
 
                 if event1 == '-LOAD_BUTTON-':
-                    choice = sg.PopupYesNo(
+                    choice = PopupYesNo(
                         'Do you want to load a save?\nYou will lose any unsaved progress if you do so.')
                     if choice == 'Yes':
                         points.clear()
@@ -679,8 +678,8 @@ def main() -> None:
                         num_points = int(save_file.readline())
                         for i in range(num_points):
                             line = save_file.readline().split()
-                            points.append([int(line[0]), int(line[1])])
-                            velocities.append(defaultVelocity)
+                            config.points.append([int(line[0]), int(line[1])])
+                            config.velocities.append(config.defaultVelocity)
                         num_turns = int(save_file.readline())
                         for i in range(num_turns):
                             line = save_file.readline().split()
@@ -689,11 +688,11 @@ def main() -> None:
 
                 # Add points and turns to list of paths and turns, then display them in the path and turn list
                 pathStrings = []
-                convertedPoints = hf.convert_coordinates_to_inches(points, pixels_per_inch=5,
+                convertedPoints = hf.convert_coordinates_to_inches(config.points, pixels_per_inch=5,
                                                                    field_length_inches=144)
                 heading = startHeading
                 prevTurn = None
-                for i in range(1, len(points)):
+                for i in range(1, len(config.points)):
                     for t in turns:
                         if t[0] == i - 1:
                             if prevTurn is None:
@@ -704,14 +703,14 @@ def main() -> None:
                     pathStrings.append(
                         'Path #' + str(i) + ': ' + hf.generate_path_string(convertedPoints[i - 1],
                                                                            convertedPoints[i],
-                                                                           velocities[i - 1], heading))
-                studio_window['-PATH_LIST-'].update(values=pathStrings)
+                                                                           config.velocities[i - 1], heading))
+                studioWindow[StudioEvents.PATH_LIST].update(values=pathStrings)
                 turnStrings = []
                 turns = hf.sort_turns(turns)
                 for i in range(0, len(turns)):
                     turnStrings.append(
                         'Turn #' + str(i + 1) + ": " + hf.generate_turn_string(turns[i], convertedPoints))
-                studio_window['-TURN_LIST-'].update(values=turnStrings)
+                studioWindow[StudioEvents.TURN_LIST].update(values=turnStrings)
 
                 # Draw turn indicators
                 for i in range(len(turnIndicator_circles)):
@@ -721,15 +720,15 @@ def main() -> None:
                     if len(turnIndicator_circles) < i + 1:
                         turnIndicator_circles.append(None)
                         turnIndicator_text.append(None)
-                    turnIndicator_circles[i] = field.draw_circle(points[turns[i][0]], 5, fill_color='black')
+                    turnIndicator_circles[i] = field.draw_circle(config.points[turns[i][0]], 5, fill_color='black')
                     turnIndicator_text[i] = field.draw_text(text=str(turns[i][1]) + '°',
-                                                            location=[points[turns[i][0]][0] + 10,
-                                                                      points[turns[i][0]][1] + 10],
+                                                            location=[config.points[turns[i][0]][0] + 10,
+                                                                      config.points[turns[i][0]][1] + 10],
                                                             color='dark blue')
 
                 # Draw robot on the field and ensures the robot cannot be magically clipping through
                 # the field walls (robot starts touching field wall if outside boundary)
-                if len(points) > 0:
+                if len(config.points) > 0:
                     field.delete_figure(robot_polygon)
                     field.delete_figure(robot_point)
                     robotCBr = [45, -45]  # Bottom right corner and go clockwise
@@ -743,14 +742,14 @@ def main() -> None:
                                                                            angle2=startHeading,
                                                                            degrees_per_second=45,
                                                                            frames_per_second=60)
-                    robotCBr = [points[0][0] + rot_deltas_final[0][0][-1],
-                                points[0][1] + rot_deltas_final[0][1][-1]]  # Bottom right corner and go clockwise
-                    robotCBl = [points[0][0] + rot_deltas_final[1][0][-1],
-                                points[0][1] + rot_deltas_final[1][1][-1]]
-                    robotCTl = [points[0][0] + rot_deltas_final[2][0][-1],
-                                points[0][1] + rot_deltas_final[2][1][-1]]
-                    robotCTr = [points[0][0] + rot_deltas_final[3][0][-1],
-                                points[0][1] + rot_deltas_final[3][1][-1]]
+                    robotCBr = [config.points[0][0] + rot_deltas_final[0][0][-1],
+                                config.points[0][1] + rot_deltas_final[0][1][-1]]  # Bottom right corner and go clockwise
+                    robotCBl = [config.points[0][0] + rot_deltas_final[1][0][-1],
+                                config.points[0][1] + rot_deltas_final[1][1][-1]]
+                    robotCTl = [config.points[0][0] + rot_deltas_final[2][0][-1],
+                                config.points[0][1] + rot_deltas_final[2][1][-1]]
+                    robotCTr = [config.points[0][0] + rot_deltas_final[3][0][-1],
+                                config.points[0][1] + rot_deltas_final[3][1][-1]]
                     robotPolygonPoints = [robotCBr, robotCBl, robotCTl, robotCTr]
                     robot_polygon = field.draw_polygon(robotPolygonPoints, line_color='black', line_width='3',
                                                        fill_color='')
@@ -760,28 +759,28 @@ def main() -> None:
                     robot_point = field.draw_point(point=robotPoint, color='yellow', size=15)
 
                     # Draw lines between all points
-                    print(points)
-                    if len(points) > 0:
+                    print(config.points)
+                    if len(config.points) > 0:
                         field.delete_figure(startPoint_circle)
-                        startPoint_circle = field.draw_circle(points[0], 5)
+                        startPoint_circle = field.draw_circle(config.points[0], 5)
                     field.delete_figure(startPoint_line)
-                    if len(points) > 1:
+                    if len(config.points) > 1:
                         lineColor = 'black'
                         if selectedPathNum == 1:
                             lineColor = 'yellow'
-                        startPoint_line = field.draw_line(points[0], points[1], color=lineColor, width=2.0)
-                    for pl in point_lines:
+                        startPoint_line = field.draw_line(config.points[0], config.points[1], color=lineColor, width=2.0)
+                    for pl in config.point_lines:
                         field.delete_figure(pl)
-                    for i in range(2, len(points)):
+                    for i in range(2, len(config.points)):
                         lineColor = 'black'
                         if selectedPathNum == i:
                             lineColor = 'yellow'
-                        if len(point_lines) < i - 1:
-                            point_lines.append(None)
-                        point_lines[i - 2] = (field.draw_line(points[i - 1], points[i], color=lineColor, width=2.0))
+                        if len(config.point_lines) < i - 1:
+                            config.point_lines.append(None)
+                        config.point_lines[i - 2] = (field.draw_line(config.points[i - 1], config.points[i], color=lineColor, width=2.0))
 
                 export_file.close()
-                title_window.close()
+                titleWindow.close()
 
 if __name__ == "__main__":
     main()
