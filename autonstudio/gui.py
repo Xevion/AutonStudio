@@ -426,17 +426,19 @@ def main() -> None:
                 # Select start point and draw the circle for it and add it to points
                 if config.studioEvent == StudioEvents.START_POINT_BUTTON:
                     config.selectedOperation = 'selectingStartPoint'
+
+                # selectStartPoint op handling
                 if config.selectedOperation == 'selectingStartPoint':
+                    # If the user clicked on the field
                     if config.studioEvent == StudioEvents.FIELD:
                         field.delete_figure(config.startPoint_circle)
                         config.startPoint_circle = field.draw_circle(
                             [config.studioValues[StudioEvents.FIELD][0], config.studioValues[StudioEvents.FIELD][1]], 5)
-                        if len(config.points) > 0:
-                            config.points[0] = (
-                            [config.studioValues[StudioEvents.FIELD][0], config.studioValues[StudioEvents.FIELD][1]])
-                        else:
-                            config.points.append([config.studioValues[StudioEvents.FIELD][0],
-                                                  config.studioValues[StudioEvents.FIELD][1]])
+                        # handling for when start point is not already picked
+                        if len(config.points) == 0:
+                            config.points[0] = None
+                        config.points[0] = [config.studioValues[StudioEvents.FIELD][0],
+                                                  config.studioValues[StudioEvents.FIELD][1]]
                         config.startHeading = float(manage.Helper.clean_coordinates(PopupGetText(
                             message='Enter start heading, 0 is straight up, 90 is to the right, -90 is to the left',
                             title='Heading selection')))
@@ -445,23 +447,32 @@ def main() -> None:
                 # Select next point and and it to list of points
                 if config.studioEvent == StudioEvents.ADD_POINT_BUTTON and len(config.points) > 0:
                     config.selectedOperation = 'addingPoint'
+
                 if config.selectedOperation == 'addingPoint':
+                    # Add a point where the user clicked on the end of the path
                     if config.studioEvent == StudioEvents.FIELD:
                         config.points.append(
                             [config.studioValues[StudioEvents.FIELD][0], config.studioValues[StudioEvents.FIELD][1]])
                         config.velocities.append(config.defaultVelocity)
                         config.selectedOperation = None
 
+                # Delete Point button handling
                 if config.studioEvent == StudioEvents.DELETE_POINT_BUTTON and len(config.points) > 0:
                     config.selectedOperation = 'deletingPoint'
+
+                # Point Deletion Handling
                 if config.selectedOperation == 'deletingPoint':
                     config.selectedTurnNum = None
                     config.selectedPathNum = None
+
+                    # Draw the Deletion Circles
                     if len(config.delete_point_circles) == 0:
                         for p in config.points[1:]:
                             config.delete_point_circles.append(field.draw_circle(p, 10, fill_color='red'))
+
+                    # Check if User clicked any
                     if config.studioEvent == StudioEvents.FIELD:
-                        for p in config.points[1:]:
+                        for p in config.points[1:]:  # User cannot click the first
                             if abs(config.studioValues[StudioEvents.FIELD][0] - p[0]) < 10 and abs(
                                     config.studioValues[StudioEvents.FIELD][1] - p[1]) < 10:
                                 index = config.points.index(p)
@@ -475,38 +486,52 @@ def main() -> None:
                                 if turn_to_remove is not None:
                                     config.turns.remove(turn_to_remove)
                                 config.selectedOperation = None
+
+                # Delete DelPoint markers if current action is not point deletion
                 if not config.selectedOperation == 'deletingPoint':
                     if len(config.delete_point_circles) > 0:
-                        for c in config.delete_point_circles:
-                            field.delete_figure(c)
+                        for delTurnCircle in config.delete_point_circles:
+                            field.delete_figure(delTurnCircle)
                         config.delete_point_circles.clear()
 
+                # Delete Turn button handling
                 if config.studioEvent == StudioEvents.DELETE_TURN_BUTTON and len(config.turns) > 0:
                     config.selectedOperation = 'deletingTurn'
+
+                # If Turn Deletion is ready
                 if config.selectedOperation == 'deletingTurn':
                     config.selectedTurnNum = None
                     config.selectedPathNum = None
+
+                    # If the delete circles haven't been drawn yet, fill them in
                     if len(config.delete_turn_circles) == 0:
                         for t in config.turns:
                             config.delete_turn_circles.append(
                                 field.draw_circle(config.points[t[0]], 10, fill_color='red'))
+
+                    # If you click somewhere on the field, check if it's close enough to a point to count
                     if config.studioEvent == StudioEvents.FIELD:
                         for t in config.turns:
                             if abs(config.studioValues[StudioEvents.FIELD][0] - config.points[t[0]][0]) < 10 and abs(
                                     config.studioValues[StudioEvents.FIELD][1] - config.points[t[0]][1]) < 10:
                                 config.turns.remove(t)
                                 config.selectedOperation = None
+
+                # Delete turn-delete-markers if the current operation is not turn deletion
                 if not config.selectedOperation == 'deletingTurn':
-                    print(len(config.delete_turn_circles))
+                    print(f'Delete Turn Circles: {len(config.delete_turn_circles)})')
                     if len(config.delete_turn_circles) > 0:
-                        for c in config.delete_turn_circles:
-                            field.delete_figure(c)
+                        for delTurnCircle in config.delete_turn_circles:
+                            field.delete_figure(delTurnCircle)
                         config.delete_turn_circles.clear()
 
                 # Select a spot to add a turn and add it to list of turns
                 if config.studioEvent == StudioEvents.ADD_TURN_BUTTON:
                     config.selectedOperation = 'addingTurn'
+
+                # If current action is addingTurn
                 if config.selectedOperation == 'addingTurn':
+                    # Turn Circle Drawing
                     if len(config.turn_circles) == 0:
                         for i in range(0, len(config.points)):
                             drawCircle = True
@@ -515,6 +540,8 @@ def main() -> None:
                                     drawCircle = False
                             if drawCircle:
                                 config.turn_circles.append(field.draw_circle(config.points[i], 10, fill_color='black'))
+
+                    # If you click on the field, scan if it hit one of the points
                     if config.studioEvent == StudioEvents.FIELD:
                         for i in range(0, len(config.points)):
                             allowPointToBeSelected = True
@@ -530,10 +557,12 @@ def main() -> None:
                                     config.selectedOperation = None
                                 else:
                                     PopupAnnoying('ERROR: Please enter a value')
+
+                # Delete TurnCircle figures if we're not using them
                 if not config.selectedOperation == 'addingTurn':
                     if len(config.turn_circles) > 0:
-                        for c in config.turn_circles:
-                            field.delete_figure(c)
+                        for delTurnCircle in config.turn_circles:
+                            field.delete_figure(delTurnCircle)
                         config.turn_circles.clear()
 
                 # Simulate the robot running through the path
@@ -703,7 +732,7 @@ def main() -> None:
                         save_file.close()
 
                 # Add points and turns to list of paths and turns, then display them in the path and turn list
-                pathStrings = []
+                config.pathStrings = []
                 config.convertedPoints = manage.Helper.convert_coordinates_to_inches(config.points, pixels_per_inch=5,
                                                                               field_length_inches=144)
                 heading = config.startHeading
@@ -721,7 +750,7 @@ def main() -> None:
                                                                                       config.convertedPoints[i],
                                                                                       config.velocities[i - 1],
                                                                                       heading))
-                studioWindow[StudioEvents.PATH_LIST].update(values=pathStrings)
+                studioWindow[StudioEvents.PATH_LIST].update(values=config.pathStrings)
                 config.turnStrings = []
                 config.turns = manage.Helper.sort_turns(config.turns)
                 for i in range(0, len(config.turns)):
@@ -774,7 +803,7 @@ def main() -> None:
                                                        fill_color='')
                     config.robotPoint = [((robotCTr[0] + robotCBr[0]) / 2.0), ((robotCTr[1] + robotCBr[1]) / 2.0)]
                     if config.startHeading == 0:
-                        robotPoint = [((robotCTr[0] + robotCTl[0]) / 2.0), ((robotCTr[1] + robotCTl[1]) / 2.0)]
+                        config.robotPoint = [((robotCTr[0] + robotCTl[0]) / 2.0), ((robotCTr[1] + robotCTl[1]) / 2.0)]
                     config.robot_point = field.draw_point(point=config.robotPoint, color='yellow', size=15)
 
                     # Draw lines between all points
