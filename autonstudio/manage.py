@@ -24,6 +24,7 @@ class Config(object):
 
         self.titleEvent, self.titleValues = None, None
         self.configEvent, self.configValues = None, None
+        self.studioEvent, self.studioValues = None, None
 
 
 class Helper(object):
