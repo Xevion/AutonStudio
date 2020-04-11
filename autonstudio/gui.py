@@ -356,20 +356,20 @@ def main() -> None:
 
                 # Change the values of a point based on what was entered into the entry field
                 if config.pathEditUpdated and config.studioEvent == StudioEvents.START_X_INPUT:
-                    value = config.studioValues[StudioEvents.START_X_INPUT]
-                    config.ppoints[config.pointMenuIndex].x = float(manage.Helper.clean_coordinates(value))*5+(720/2)
+                    value = manage.Helper.getDigits(config.studioValues[StudioEvents.START_X_INPUT])
+                    config.ppoints[config.pointMenuIndex].x = float(value)*5+(720/2)
                 elif config.studioEvent == StudioEvents.START_Y_INPUT:
-                    value = config.studioValues[StudioEvents.START_Y_INPUT]
-                    config.points[config.pointMenuIndex].y = float(manage.Helper.clean_coordinates(value))*5+(720/2)
+                    value = manage.Helper.getDigits(config.studioValues[StudioEvents.START_Y_INPUT])
+                    config.points[config.pointMenuIndex].y = float(value)*5+(720/2)
                 elif config.studioEvent == StudioEvents.FINAL_X_INPUT:
-                    value = config.studioValues[StudioEvents.FINAL_X_INPUT]
-                    config.points[config.pointMenuIndex + 1].x = float(manage.Helper.clean_coordinates(value))*5+(720/2)
+                    value = manage.Helper.getDigits(config.studioValues[StudioEvents.FINAL_X_INPUT])[0]
+                    config.points[config.pointMenuIndex + 1].x = float(value)*5+(720/2)
                 elif config.studioEvent == StudioEvents.FINAL_Y_INPUT:
-                    value = config.studioValues[StudioEvents.FINAL_Y_INPUT]
-                    config.points[config.pointMenuIndex + 1].y = float(manage.Helper.clean_coordinates(value))*5+(720/2)
+                    value = manage.Helper.getDigits(config.studioValues[StudioEvents.FINAL_Y_INPUT])[0]
+                    config.points[config.pointMenuIndex + 1].y = float(value)*5+(720/2)
                 elif config.studioEvent == StudioEvents.VELOCITY_INPUT:
-                    value = config.studioValues[StudioEvents.VELOCITY_INPUT]
-                    config.velocities[config.pointMenuIndex].velocity = float(manage.Helper.clean_coordinates(value))
+                    value = manage.Helper.getDigits(config.studioValues[StudioEvents.VELOCITY_INPUT])[0]
+                    config.velocities[config.pointMenuIndex].velocity = float(value)
 
                 # Rounds all the points to the nearest inch
                 # if config.studioEvent == StudioEvents.ROUND_ALL_BUTTON:

@@ -72,7 +72,7 @@ class Helper(object):
     Not to be instantiated. Static methods only.
     """
 
-    digits_pattern = re.compile("\d+(?:\.\d+)")
+    digits_pattern = re.compile("\-{0,1}\d+(?:\.\d+)")
     path_pattern = re.compile('Path #(\d+):')  # Used for identifying the current selected path within the menu.
 
     @staticmethod
