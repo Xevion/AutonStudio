@@ -105,17 +105,8 @@ class Helper(object):
 
     @staticmethod
     def convert_coordinates_to_inches(points, pixels_per_inch, field_length_inches):
-        converted_points = []
-        for p in points:
-            new_point = [None, None]
-            new_point[0] = p[0] / pixels_per_inch
-            new_point[1] = p[1] / pixels_per_inch
-            new_point[0] -= (field_length_inches / 2.0)
-            new_point[1] -= (field_length_inches / 2.0)
-            new_point[0] = round(new_point[0], 2)
-            new_point[1] = round(new_point[1], 2)
-            converted_points.append(new_point)
-        return converted_points
+        return [[round(p[0] / pixels_per_inch - (field_length_inches / 2), 2),
+                 round(p[1] / pixels_per_inch - (field_length_inches / 2), 2)] for p in points]
 
     @staticmethod
     def convert_coordinates_to_pixels(points, pixels_per_inch, field_length_pixels):
