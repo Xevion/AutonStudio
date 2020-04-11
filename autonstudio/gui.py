@@ -390,15 +390,17 @@ def main() -> None:
                     studioWindow[StudioEvents.VELOCITY_INPUT].hide_row()
 
                 # Choose which turn to edit
-                # if config.studioEvent == StudioEvents.EDIT_TURN_BUTTON:
-                #     counter = 0
-                #     config.turnEditUpdated = False
-                #     for t in config.turnStrings:
-                #         counter += 1
-                #         if len(config.studioValues[StudioEvents.TURN_LIST]) > 0 and \
-                #                 config.studioValues[StudioEvents.TURN_LIST][0] == t:
-                #             studioWindow[StudioEvents.TURN_INFO].update('Turn #' + str(counter))
-                #             config.selectedTurnNum = counter
+                if config.studioEvent == StudioEvents.EDIT_TURN_BUTTON:
+                    if config.studioValues[StudioEvents.TURN_LIST]:
+                        if len(filter(lambda point : point.turn is not None)) > 0:
+                            config.turnEditorIndex = manage.Helper.getTurnIndex(config.studioValues[StudioEvents.TURN_LIST][0])
+                            studioWindow[StudioEvents.TURN_INFO].update(f'Turn #{config.turnEditorIndex}')
+                            config.turnEditUpdated = False
+                        else:
+                            logger.warning('No Turns are available to be selected.')
+                    else:
+                        logger.warning('No Turn is Selected.')
+
 
                 # if config.selectedTurnNum is None:
                 #     studioWindow[StudioEvents.ANGLE_TEXT].hide_row()
