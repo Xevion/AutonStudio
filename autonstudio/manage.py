@@ -207,6 +207,18 @@ class Point(object):
         self.deleteMarker = None
         self.turnIndicator = None
 
+    def converted(self, ppi, field_length):
+        """
+        Helper function for converting a point to inches.
+        :param ppi: Pixels per Inch
+        :param field_length: Field Length in Inches (?)
+        :return: A simple tuple containing the converted point.
+        """
+        return (
+            self.x / ppi - (field_length / 2),
+            self.y / ppi - (field_length / 2)
+        )
+
     def render(self, canvas: Graph, action: None) -> None:
         """
         Renders the point (and associated turns) on the field, deleting it if it was rendered.
