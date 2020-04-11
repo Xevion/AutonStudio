@@ -314,52 +314,43 @@ def main() -> None:
                     break
 
                 # Clears all field elements and paths
-                # if config.studioEvent == StudioEvents.CLEAR_FIELD_BUTTON and len(config.points) > 0:
-                #     field.delete_figure(config.robot_rectangle)
-                #     field.delete_figure(config.robot_polygon)
-                #     field.delete_figure(config.robot_point)
-                #     field.delete_figure(config.startPoint_circle)
-                #     for tc in config.turn_circles:
-                #         field.delete_figure(tc)
-                #     for tic in config.turnIndicator_circles:
-                #         field.delete_figure(tic)
-                #     field.delete_figure(config.startPoint_line)
-                #     for pl in config.point_lines:
-                #         field.delete_figure(pl)
-                #     for tit in config.turnIndicator_text:
-                #         field.delete_figure(tit)
-                #     config.points.clear()
-                #     config.point_lines.clear()
-                #     config.turn_circles.clear()
-                #     config.turnIndicator_circles.clear()
-                #     config.turnIndicator_text.clear()
-                #     config.turns.clear()
-                #     config.convertedPoints.clear()
-                #     config.pathStrings.clear()
-                #     config.turnStrings.clear()
-                #     config.fieldSave = None
+                if config.studioEvent == StudioEvents.CLEAR_FIELD_BUTTON and len(config.points) > 0:
+                    # Clear all points, stop rendering etc.
+                    while len(config.ppoints) > 0:
+                        config.ppoints.pop(0).delete()
+
+                    # TODO: Stop rendering the robot
+                    # TODO: Clear the Paths/Points tab
+                    # TODO: Clear the Turns tab
 
                 # Choose which path to edit
                 if config.studioEvent == StudioEvents.EDIT_PATH_BUTTON:
-                    counter = 0
-                    config.pathEditUpdated = False
-                    for p in config.pathStrings:
-                        counter += 1
-                        if len(config.studioValues[StudioEvents.PATH_LIST]) > 0 and config.studioValues[StudioEvents.PATH_LIST][0] == p:
-                            print(config.studioValues)
-                            studioWindow[StudioEvents.PATH_INFO].update('Path #' + str(counter))
-                            config.selectedPathNum = counter
+                    config.pointMenuIndex = manage.Helper.getPointIndex(config.studioValues[StudioEvents.PATH_LIST][0])
+                    logger.debug(f'Point Menu Index Identified: {config.pointMenuIndex}')
+
+                # if config.studioEvent == StudioEvents.EDIT_PATH_BUTTON:
+                #     counter = 0
+                #     config.pathEditUpdated = False
+                #     for p in config.pathStrings:
+                #         counter += 1
+                #         if len(config.studioValues[StudioEvents.PATH_LIST]) > 0 and config.studioValues[StudioEvents.PATH_LIST][0] == p:
+                #             print(config.studioValues)
+                #             studioWindow[StudioEvents.PATH_INFO].update('Path #' + str(counter))
+                #             config.selectedPathNum = counter
 
                 # Show the entry fields for editing the path
-                if config.selectedPathNum is not None and not config.pathEditUpdated:
+                if config.pointMenuIndex is not None and len(config.ppoints) >= 2:
+                    logger.debug('Updating Point Editing Menu')
+                    # Unhide input boxes
                     studioWindow[StudioEvents.START_X_TEXT].unhide_row()
                     studioWindow[StudioEvents.FINAL_X_INPUT].unhide_row()
                     studioWindow[StudioEvents.VELOCITY_INPUT].unhide_row()
                     studioWindow[StudioEvents.DESELECT_BUTTON].unhide_row()
-                    studioWindow[StudioEvents.START_X_INPUT].update(value=config.convertedPoints[config.selectedPathNum - 1][0])
-                    studioWindow[StudioEvents.START_Y_INPUT].update(value=config.convertedPoints[config.selectedPathNum - 1][1])
-                    studioWindow[StudioEvents.FINAL_X_INPUT].update(value=config.convertedPoints[config.selectedPathNum][0])
-                    studioWindow[StudioEvents.FINAL_Y_INPUT].update(value=config.convertedPoints[config.selectedPathNum][1])
+                    # Update all of the input boxes
+                    studioWindow[StudioEvents.START_X_INPUT].update(value=config.ppoints[config.pointMenuIndex].x)
+                    studioWindow[StudioEvents.START_Y_INPUT].update(value=config.ppoints[config.pointMenuIndex].y)
+                    studioWindow[StudioEvents.FINAL_X_INPUT].update(value=config.ppoints[config.pointMenuIndex + 1].x)
+                    studioWindow[StudioEvents.FINAL_Y_INPUT].update(value=config.ppoints[config.pointMenuIndex + 1].y)
                     studioWindow[StudioEvents.VELOCITY_INPUT].update(value=config.velocities[config.selectedPathNum - 1])
                     config.pathEditUpdated = True
 
