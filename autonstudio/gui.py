@@ -392,7 +392,7 @@ def main() -> None:
                 # Choose which turn to edit
                 if config.studioEvent == StudioEvents.EDIT_TURN_BUTTON:
                     if config.studioValues[StudioEvents.TURN_LIST]:
-                        if len(filter(lambda point : point.turn is not None)) > 0:
+                        if len(filter(lambda point : point.turn is not None), config.ppoints) > 0:
                             config.turnEditorIndex = manage.Helper.getTurnIndex(config.studioValues[StudioEvents.TURN_LIST][0])
                             studioWindow[StudioEvents.TURN_INFO].update(f'Turn #{config.turnEditorIndex}')
                             config.turnEditUpdated = False
