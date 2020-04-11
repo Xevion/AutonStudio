@@ -372,22 +372,22 @@ def main() -> None:
                     config.velocities[config.pointMenuIndex].velocity = float(value)
 
                 # Rounds all the points to the nearest inch
-                # if config.studioEvent == StudioEvents.ROUND_ALL_BUTTON:
-                #     for i in range(0, len(config.convertedPoints)):
-                #         config.points[i][0] = round(config.convertedPoints[i][0]) * 5 + (720 / 2)
-                #         config.points[i][1] = round(config.convertedPoints[i][1]) * 5 + (720 / 2)
+                if config.studioEvent == StudioEvents.ROUND_ALL_BUTTON:
+                    logger.debug('Rounding all {len(config.ppoints)} points.')
+                    for p in config.ppoints:
+                        p.x, p.y = round(p.x, 2), round(p.y, 2)
 
                 # Deselect the current path
-                # if config.studioEvent == StudioEvents.DESELECT_BUTTON:
-                #     if config.selectedPathNum is not None:
-                #         logger.debug('Deselecting Path Item')
-                #         config.selectedPathNum = None
-                # if config.selectedPathNum is None:
-                #     studioWindow[StudioEvents.PATH_INFO].update('None')
-                #     studioWindow[StudioEvents.START_X_TEXT].hide_row()
-                #     studioWindow[StudioEvents.FINAL_X_INPUT].hide_row()
-                #     studioWindow[StudioEvents.DESELECT_BUTTON].hide_row()
-                #     studioWindow[StudioEvents.VELOCITY_INPUT].hide_row()
+                if config.studioEvent == StudioEvents.DESELECT_BUTTON and config.pointMenuIndex is not None:
+                    logger.debug('Deselecting Path Item.')
+                    config.pointMenuIndex = None
+
+                if config.selectedPathNum is None:
+                    studioWindow[StudioEvents.PATH_INFO].update('None')
+                    studioWindow[StudioEvents.START_X_TEXT].hide_row()
+                    studioWindow[StudioEvents.FINAL_X_INPUT].hide_row()
+                    studioWindow[StudioEvents.DESELECT_BUTTON].hide_row()
+                    studioWindow[StudioEvents.VELOCITY_INPUT].hide_row()
 
                 # Choose which turn to edit
                 # if config.studioEvent == StudioEvents.EDIT_TURN_BUTTON:
