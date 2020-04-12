@@ -64,6 +64,7 @@ class Config(object):
         self.ppoints = []
         self.pointMenuIndex = None  # The index of the selected point within the points list.
         self.pointEditorUpdate = False  # Whether or not the point editing menu has updated.
+        self.turnEditorIndex = None  # The index of the selected turn within the turns list.
 
 
 class Helper(object):
@@ -72,8 +73,9 @@ class Helper(object):
     Not to be instantiated. Static methods only.
     """
 
-    digits_pattern = re.compile("\-{0,1}\d+(?:\.\d+)")
-    path_pattern = re.compile('Path #(\d+):')  # Used for identifying the current selected path within the menu.
+    digits_pattern = re.compile(r"-?\d+(?:\.\d+)")  # Pattern for numbers in a string; Supports decimals/negatives.
+    path_pattern = re.compile(r'Path #(\d+):')  # Used for identifying the current selected path within the menu.
+    turn_pattern = re.compile(r'Turn #(\d+):')  # Used for identifying which nTH turn is selected in the menu.
 
     @staticmethod
     def getDigits(string):
@@ -256,13 +258,15 @@ class Point(object):
         """
         return f'Path #{self.index + 1}: ({self.x}, {self.y}) to ({other.x}, {other.y}) going {self.velocity} in/s at {self.turn}°'
 
-    def getTurnstring(self) -> str:
+    def getTurnstring(self, n=None) -> str:
         """
         Generates a Turn String if a turn is being made. Otherwise raises an exception.
+
+        :param n: where n refers to the nth turn in a list of points with and without turns
         :return: A string explaining the turn being taken at this point.
         """
         if self.turn is not None:
-            return f'Turn to {self.turn} ° at ({self.x}, {self.y})'
+            return (f'Turn #{n}' if n else '') + f'Turn to {self.turn} ° at ({self.x}, {self.y})'
         else:
             raise exceptions.NoPointTurning(f'Point #{self.index + 1} does not turn.')
 
