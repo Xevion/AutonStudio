@@ -373,7 +373,7 @@ def main() -> None:
 
                 # Rounds all the points to the nearest inch
                 if config.studioEvent == StudioEvents.ROUND_ALL_BUTTON:
-                    logger.debug('Rounding all {len(config.ppoints)} points.')
+                    logger.debug(f'Rounding all {len(config.ppoints)} points.')
                     for p in config.ppoints:
                         p.x, p.y = round(p.x, 2), round(p.y, 2)
 
@@ -393,29 +393,41 @@ def main() -> None:
                 if config.studioEvent == StudioEvents.EDIT_TURN_BUTTON:
                     if config.studioValues[StudioEvents.TURN_LIST]:
                         if len(list(filter(lambda point: point.turn is not None, config.ppoints))) > 0:
-                            config.turnEditorIndex = manage.Helper.getTurnIndex(
-                                config.studioValues[StudioEvents.TURN_LIST][0])
-                            studioWindow[StudioEvents.TURN_INFO].update(f'Turn #{config.turnEditorIndex}')
+                            # Get the relative index
+                            n = manage.Helper.getTurnIndex(config.studioValues[StudioEvents.TURN_LIST][0])
+                            cur_n = 0
+                            # Start scanning
+                            for index, point in enumerate(config.ppoints):
+                                if point.turn is not None:
+                                    cur_n += 1
+                                    if cur_n == n:
+                                        logger.debug(f'Turn located at Point Index {index}')
+                                        config.turnEditorIndex = index
+                                        break
+                            studioWindow[StudioEvents.TURN_INFO].update(
+                                f'Turn #{n+1} located with Point #{config.turnEditorIndex}')
                             config.turnEditUpdated = False
                         else:
                             logger.warning('No Turns are available to be selected.')
                     else:
                         logger.warning('No Turn is Selected.')
 
+                # Hide Turn Editor if it's not being used
+                if config.turnEditorIndex is None:
+                    studioWindow[StudioEvents.ANGLE_TEXT].hide_row()
+                    studioWindow[StudioEvents.TURN_INFO].update('None')
 
-                # if config.selectedTurnNum is None:
-                #     studioWindow[StudioEvents.ANGLE_TEXT].hide_row()
-                #     studioWindow[StudioEvents.TURN_INFO].update('None')
                 # Show the entry fields for editing the turn
-                # if config.selectedTurnNum is not None and not config.turnEditUpdated:
-                #     studioWindow[StudioEvents.ANGLE_TEXT].unhide_row()
-                #     studioWindow[StudioEvents.ANGLE_INPUT].update(value=config.turns[config.selectedTurnNum - 1][1])
-                #     config.turnEditUpdated = True
+                if config.turnEditorIndex is not None and not config.turnEditUpdated:
+                    studioWindow[StudioEvents.ANGLE_TEXT].unhide_row()
+                    studioWindow[StudioEvents.ANGLE_INPUT].update(value=config.ppoints[config.turnEditorIndex].turn)
+                    config.turnEditUpdated = True
+
                 # Change the angle value of a turn based on what was entered into the entry field
-                # if config.turnEditUpdated:
-                #     if config.studioEvent == StudioEvents.ANGLE_INPUT:
-                #         config.turns[config.selectedTurnNum - 1][1] = float(
-                #             manage.Helper.clean_coordinates(config.studioValues[StudioEvents.ANGLE_INPUT]))
+                if config.turnEditUpdated:
+                    if config.studioEvent == StudioEvents.ANGLE_INPUT:
+                        value = config.studioValues[StudioEvents.ANGLE_INPUT]
+                        config.ppoints[config.turnEditorIndex].turn = float(manage.Helper.getDigits(value))
 
                 # Select start point and draw the circle for it and add it to points
                 # if config.studioEvent == StudioEvents.START_POINT_BUTTON:
