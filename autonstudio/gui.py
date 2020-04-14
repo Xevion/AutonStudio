@@ -440,16 +440,15 @@ def main() -> None:
                     # If the user clicked on the field
                     if config.studioEvent == StudioEvents.FIELD:
                         logging.debug('Inserting new point')
-                        if len(config.ppoints) > 0:
-                            # Grab position values
-                            x, y = config.studioValues[StudioEvents.FIELD][0], config.studioValues[StudioEvents.FIELD][1]
-                            # Ensure there is at minimum something to write the Point onto.
-                            if len(config.ppoints) == 0: config.ppoints.append(None)
-                            # Insert the new point
-                            config.ppoints[0] = manage.Point(x, y, 0)
-                            # Make sure all other point indexes are sync'd up
-                            for point in config.ppoints[1:]:
-                                point.index += 1
+                        # Grab position values
+                        x, y = config.studioValues[StudioEvents.FIELD][0], config.studioValues[StudioEvents.FIELD][1]
+                        # Ensure there is at minimum something to write the Point onto.
+                        if len(config.ppoints) == 0: config.ppoints.append(None)
+                        # Insert the new point
+                        config.ppoints[0] = manage.Point(x, y, 0)
+                        # Make sure all other point indexes are sync'd up
+                        for point in config.ppoints[1:]:
+                            point.index += 1
                         # TODO: Ensure that rendering happens in the right order.
                         # Note: startHeading is a different parameter than the point's turn attribute.
                         config.startHeading = float(manage.Helper.clean_coordinates(PopupGetText(
@@ -457,17 +456,22 @@ def main() -> None:
                             title='Heading selection')))
                         config.selectedOperation = None
 
+                print(config.ppoints)
+
                 # Select next point and and it to list of points
-                if config.studioEvent == StudioEvents.ADD_POINT_BUTTON and len(config.points) > 0:
+                if config.studioEvent == StudioEvents.ADD_POINT_BUTTON and len(config.ppoints) > 0:
                     config.selectedOperation = StudioActions.ADD_POINT
 
-                # if config.selectedOperation == StudioActions.ADD_POINT:
-                #     # Add a point where the user clicked on the end of the path
-                #     if config.studioEvent == StudioEvents.FIELD:
-                #         config.points.append(
-                #             [config.studioValues[StudioEvents.FIELD][0], config.studioValues[StudioEvents.FIELD][1]])
-                #         config.velocities.append(config.defaultVelocity)
-                #         config.selectedOperation = None
+                if config.selectedOperation == StudioActions.ADD_POINT:
+                    # Add a point where the user clicked on the end of the path
+                    if config.studioEvent == StudioEvents.FIELD:
+                        # Grab current position values
+                        x, y = config.studioValues[StudioEvents.FIELD][0], config.studioValues[StudioEvents.FIELD][1]
+                        logger.debug(f'Inserting new point into list at ({x}, {y})')
+                        # Insert new Point into list
+                        config.ppoints.append(Point(x, y, config.ppoints[-1].index + 1))
+                        # Shouldn't have an effect, but remove current action.
+                        config.selectedOperation = None
 
                 # Delete Point button handling
                 if config.studioEvent == StudioEvents.DELETE_POINT_BUTTON and len(config.points) > 0:
