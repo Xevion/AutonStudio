@@ -247,14 +247,26 @@ class Point(object):
         # if self.turn:
         #     self.turnIndicator = canvas.draw
 
-        if action == enums.StudioActions.ADD_POINT:
+        if action == enums.StudioActions.DELETE_POINT:
             pass
-        elif action == enums.StudioActions.DELETE_POINT:
+        else:
+            if self.deleteMarker is not None:
+                logger.debug(f'Removing Point {self.index}\'s Point Delete Marker')
+                self.deleteMarker = canvas.delete_figure(self.deleteMarker)
+
+        if action == enums.StudioActions.ADD_TURN:
             pass
-        elif action == enums.StudioActions.ADD_TURN:
+        else:
+            if self.addTurnMarker is not None:
+                logger.debug(f'Removing Point {self.index}\'s Add Turn Marker')
+                self.addTurnMarker = canvas.delete_figure(self.addTurnMarker)
+
+        if action == enums.StudioActions.DELETE_TURN:
             pass
-        elif action == enums.StudioActions.DELETE_TURN:
-            pass
+        else:
+            if self.deleteTurnMarker is not None:
+                logger.debug(f'Removing Point {self.index}\'s Turn Delete Marker')
+                self.deleteTurnMarker = canvas.delete_figure(self.deleteTurnMarker)
 
     def delete(self, canvas: Graph) -> None:
         """
