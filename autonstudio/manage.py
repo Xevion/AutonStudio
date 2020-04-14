@@ -112,30 +112,25 @@ class Helper(object):
 
     @staticmethod
     def generate_path_string(p1, p2, velocity, heading):
+        # Method for filling out the Path List
         return f'({p1[0]}, {p1[1]}) to ({p2[0]}, {p2[1]}) going {velocity} in/s at {heading}°'
 
     @staticmethod
     def generate_turn_string(turn, points):
+        # Method for filling out the Turn List
         return f'Turn to {turn[1]} ° at ({points[turn[0]][0]}, {points[turn[0]][1]})'
 
     @staticmethod
     def convert_coordinates_to_inches(points, pixels_per_inch, field_length_inches):
+        # Converts a list of pixel coordinates to inch based coordinates
         return [[round(p[0] / pixels_per_inch - (field_length_inches / 2), 2),
                  round(p[1] / pixels_per_inch - (field_length_inches / 2), 2)] for p in points]
 
     @staticmethod
-    def convert_coordinates_to_pixels(points, pixels_per_inch, field_length_pixels):
-        converted_points = []
-        for p in points:
-            new_point = [None, None]
-            new_point[0] = p[0] * pixels_per_inch
-            new_point[1] = p[1] * pixels_per_inch
-            new_point[0] += (field_length_pixels / 2.0)
-            new_point[1] += (field_length_pixels / 2.0)
-            new_point[0] = round(new_point[0], 2)
-            new_point[1] = round(new_point[1], 2)
-            converted_points.append(new_point)
-        return converted_points
+    def convert_coordinates_to_pixels(points, ppi, field_length_pixels):
+        # Converts a list of inch coordinates to pixel based coordinates
+        return [[round(p[0] * ppi + (field_length_pixels / 2.0)),
+                 round(p[1] * ppi + (field_length_pixels / 2.0))] for p in points]
 
     @staticmethod
     def calculate_movement_per_frame(point1, point2, inches_per_second, frames_per_second, pixels_per_inch):
@@ -159,6 +154,7 @@ class Helper(object):
 
     @staticmethod
     def clean_coordinates(coord=''):
+        # Seems to be used for acquiring numbers from
         string = ''.join(c for c in coord if c.isdigit() or c == '.' or c == '-')
         if len(string) > 0 and (string[0] == '.'):
             string = string[1:-1]
@@ -170,6 +166,7 @@ class Helper(object):
 
     @staticmethod
     def sort_turns(turns):
+        # What the actual fuck.
         if len(turns) > 0:
             sorted_turns = [turns[0]]
             for t in turns:
@@ -186,6 +183,8 @@ class Helper(object):
 
     @staticmethod
     def calculate_rotation_per_frame(points, angle1, angle2, degrees_per_second, frames_per_second):
+        # I have no idea how this works.
+
         deltas = []
         degrees_per_frame = degrees_per_second / frames_per_second
         for p in points:
