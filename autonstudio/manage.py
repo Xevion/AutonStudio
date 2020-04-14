@@ -3,12 +3,16 @@ This file contains models helpful with managing data and configuration values wi
 Hopefully, most of the raw logic and calculations will be placed here in order to abstract parts of the GUI away,
 and allow for a overall simpler to debug and manage application.
 """
+
+import logging
 import math
 import re
 
 from PySimpleGUI import Graph
-
 from autonstudio import exceptions, enums
+
+logger = logging.getLogger('gui')
+logger.setLevel(logging.DEBUG)
 
 
 class Config(object):
@@ -244,18 +248,20 @@ class Point(object):
         """
 
         if self.index == 0:
-            self.circle = canvas.draw_circle((self.x, self.y), 5)
+            if self.circle is not None:
+                self.circle = canvas.draw_circle((self.x, self.y), 5)
 
         # if self.turn:
         #     self.turnIndicator = canvas.draw
 
-        if action == enums.StudioActions.DELETE_POINT:
-            if self.deleteMarker is None:
-                self.deleteMarker = canvas.draw_circle((self.x, self.y), 10, fill_color='red')
-        else:
-            if self.deleteMarker is not None:
-                logger.debug(f'Removing Point {self.index}\'s Point Delete Marker')
-                self.deleteMarker = canvas.delete_figure(self.deleteMarker)
+        if self.index != 0:
+            if action == enums.StudioActions.DELETE_POINT:
+                if self.deleteMarker is None:
+                    self.deleteMarker = canvas.draw_circle((self.x, self.y), 10, fill_color='red')
+            else:
+                if self.deleteMarker is not None:
+                    logger.debug(f'Removing Point {self.index}\'s Point Delete Marker')
+                    self.deleteMarker = canvas.delete_figure(self.deleteMarker)
 
         if action == enums.StudioActions.ADD_TURN:
             pass

@@ -498,7 +498,7 @@ def main() -> None:
                         # Check if any points matched
                         if index is not None:
                             logger.debug(f'Deleting Point {index} from list')
-                            config.ppoints.pop(index).delete()  # Remove the point from the list, call deletion protocol
+                            config.ppoints.pop(index).delete(canvas=field)  # Remove the point from the list, call deletion protocol
                             # Update all indexes
                             for point in config.ppoints[index:]:
                                 point.index += 1
@@ -780,7 +780,7 @@ def main() -> None:
                 #                                                    color='dark blue')
 
                 for point in config.ppoints:
-                    point.render(field, action=config.selectedOperation)
+                    point.render(canvas=field, action=config.selectedOperation)
 
                 # Draw robot on the field and ensures the robot cannot be magically clipping through
                 # the field walls (robot starts touching field wall if outside boundary)
