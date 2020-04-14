@@ -12,6 +12,7 @@ from PySimpleGUI import Text, Button, Listbox, Column, Image, Window, Combo, Gra
 from autonstudio import manage
 from autonstudio.enums import TitleEvents, ConfigEvents, StudioEvents, StudioActions
 from autonstudio.exceptions import InvalidRobotDimensions
+from autonstudio.manage import Point
 
 logging.basicConfig(
     format='[%(asctime)s] [%(name)s] [%(levelname)s] [%(funcName)s] %(message)s',
@@ -404,6 +405,7 @@ def main() -> None:
                                         logger.debug(f'Turn located at Point Index {index}')
                                         config.turnEditorIndex = index
                                         break
+                            # Finally, update the GUI elements
                             studioWindow[StudioEvents.TURN_INFO].update(
                                 f'Turn #{n+1} located with Point #{config.turnEditorIndex}')
                             config.turnEditUpdated = False
@@ -430,25 +432,30 @@ def main() -> None:
                         config.ppoints[config.turnEditorIndex].turn = float(manage.Helper.getDigits(value))
 
                 # Select start point and draw the circle for it and add it to points
-                # if config.studioEvent == StudioEvents.START_POINT_BUTTON:
-                #     config.selectedOperation = StudioActions.ADD_START_POINT
+                if config.studioEvent == StudioEvents.START_POINT_BUTTON:
+                    config.selectedOperation = StudioActions.ADD_START_POINT
 
                 # selectStartPoint op handling
-                # if config.selectedOperation == StudioActions.ADD_START_POINT:
-                #     # If the user clicked on the field
-                #     if config.studioEvent == StudioEvents.FIELD:
-                #         field.delete_figure(config.startPoint_circle)
-                #         config.startPoint_circle = field.draw_circle(
-                #             [config.studioValues[StudioEvents.FIELD][0], config.studioValues[StudioEvents.FIELD][1]], 5)
-                #         # handling for when start point is not already picked
-                #         if len(config.points) == 0:
-                #             config.points.append(None)
-                #         config.points[0] = [config.studioValues[StudioEvents.FIELD][0],
-                #                                   config.studioValues[StudioEvents.FIELD][1]]
-                #         config.startHeading = float(manage.Helper.clean_coordinates(PopupGetText(
-                #             message='Enter start heading, 0 is straight up, 90 is to the right, -90 is to the left',
-                #             title='Heading selection')))
-                #         config.selectedOperation = None
+                if config.selectedOperation == StudioActions.ADD_START_POINT:
+                    # If the user clicked on the field
+                    if config.studioEvent == StudioEvents.FIELD:
+                        logging.debug('Inserting new point')
+                        if len(config.ppoints) > 0:
+                            # Grab position values
+                            x, y = config.studioValues[StudioEvents.FIELD][0], config.studioValues[StudioEvents.FIELD][1]
+                            # Ensure there is at minimum something to write the Point onto.
+                            if len(config.ppoints) == 0: config.ppoints.append(None)
+                            # Insert the new point
+                            config.ppoints[0] = manage.Point(x, y, 0)
+                            # Make sure all other point indexes are sync'd up
+                            for point in config.ppoints[1:]:
+                                point.index += 1
+                        # TODO: Ensure that rendering happens in the right order.
+                        # Note: startHeading is a different parameter than the point's turn attribute.
+                        config.startHeading = float(manage.Helper.clean_coordinates(PopupGetText(
+                            message='Enter start heading, 0 is straight up, 90 is to the right, -90 is to the left',
+                            title='Heading selection')))
+                        config.selectedOperation = None
 
                 # Select next point and and it to list of points
                 if config.studioEvent == StudioEvents.ADD_POINT_BUTTON and len(config.points) > 0:
