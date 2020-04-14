@@ -8,7 +8,7 @@ import re
 
 from PySimpleGUI import Graph
 
-from autonstudio import exceptions
+from autonstudio import exceptions, enums
 
 
 class Config(object):
@@ -218,6 +218,7 @@ class Point(object):
         self.x, self.y, self.index, self.turn, self.velocity = x, y, i, 0.0, 42
 
         # Rendering attributes
+        self.circle = None  # A circle marker.
         self.deleteMarker = None
         self.turnIndicator = None
 
@@ -233,13 +234,27 @@ class Point(object):
             self.y / ppi - (field_length / 2)
         )
 
-    def render(self, canvas: Graph, action: None) -> None:
+    def render(self, canvas: Graph, action: enums.StudioActions = None) -> None:
         """
         Renders the point (and associated turns) on the field, deleting it if it was rendered.
         :param canvas: A Graph object where figures will be rendered.
         :param action: The current action being taken by the User inside the Studio.
         """
-        pass
+
+        if self.index == 0:
+            self.circle = canvas.draw_circle(self.x, self.y, 5)
+
+        # if self.turn:
+        #     self.turnIndicator = canvas.draw
+
+        if action == enums.StudioActions.ADD_POINT:
+            pass
+        elif action == enums.StudioActions.DELETE_POINT:
+            pass
+        elif action == enums.StudioActions.ADD_TURN:
+            pass
+        elif action == enums.StudioActions.DELETE_TURN:
+            pass
 
     def delete(self, canvas: Graph) -> None:
         """
