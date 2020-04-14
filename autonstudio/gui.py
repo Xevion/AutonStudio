@@ -478,38 +478,31 @@ def main() -> None:
                     config.selectedOperation = StudioActions.DELETE_POINT
 
                 # Point Deletion Handling
-                # if config.selectedOperation == StudioActions.DELETE_POINT:
-                #     config.selectedTurnNum = None
-                #     config.selectedPathNum = None
-
-                    # Draw the Deletion Circles
-                    # if len(config.delete_point_circles) == 0:
-                    #     for p in config.points[1:]:
-                    #         config.delete_point_circles.append(field.draw_circle(p, 10, fill_color='red'))
+                if config.selectedOperation == StudioActions.DELETE_POINT:
+                    # Not sure why this is here. It may be in order to fix a bug.
+                    config.selectedTurnNum = None
+                    config.selectedPathNum = None
 
                     # Check if User clicked any
-                    # if config.studioEvent == StudioEvents.FIELD:
-                    #     for p in config.points[1:]:  # User cannot click the first
-                    #         if abs(config.studioValues[StudioEvents.FIELD][0] - p[0]) < 10 and abs(
-                    #                 config.studioValues[StudioEvents.FIELD][1] - p[1]) < 10:
-                    #             index = config.points.index(p)
-                    #             config.points.remove(p)
-                    #             turn_to_remove = None
-                    #             for t in config.turns:
-                    #                 if index == t[0]:
-                    #                     turn_to_remove = t
-                    #                 if index < t[0]:
-                    #                     t[0] = t[0] - 1
-                    #             if turn_to_remove is not None:
-                    #                 config.turns.remove(turn_to_remove)
-                    #             config.selectedOperation = None
+                    if config.studioEvent == StudioEvents.FIELD:
+                        # Must be more than just the start point to try.
+                        index = None
+                        if len(config.ppoints) > 1:
+                            for i, point in enumerate(config.ppoints[1:], start=1):
+                                x, y = config.studioValues[StudioEvents.FIELD][0], config.studioValues[StudioEvents.FIELD][1]
+                                # Check if point was clicked
+                                if point.isClicked(x, y):
+                                    index = i
+                                    break
 
-                # Delete DelPoint markers if current action is not point deletion
-                # if not config.selectedOperation == StudioActions.DELETE_POINT:
-                #     if len(config.delete_point_circles) > 0:
-                #         for turnCircle in config.delete_point_circles:
-                #             field.delete_figure(turnCircle)
-                #         config.delete_point_circles.clear()
+                        # Check if any points matched
+                        if index is not None:
+                            logger.debug(f'Deleting Point {index} from list')
+                            config.ppoints.pop(index).delete()  # Remove the point from the list, call deletion protocol
+                            # Update all indexes
+                            for point in config.ppoints[index:]:
+                                point.index += 1
+                            config.selectedOperation = None
 
                 # Delete Turn button handling
                 if config.studioEvent == StudioEvents.DELETE_TURN_BUTTON and len(config.turns) > 0:
