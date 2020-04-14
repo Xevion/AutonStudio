@@ -474,7 +474,7 @@ def main() -> None:
                         config.selectedOperation = None
 
                 # Delete Point button handling
-                if config.studioEvent == StudioEvents.DELETE_POINT_BUTTON and len(config.points) > 0:
+                if config.studioEvent == StudioEvents.DELETE_POINT_BUTTON and len(config.ppoints) > 0:
                     config.selectedOperation = StudioActions.DELETE_POINT
 
                 # Point Deletion Handling
@@ -505,7 +505,7 @@ def main() -> None:
                             config.selectedOperation = None
 
                 # Delete Turn button handling
-                if config.studioEvent == StudioEvents.DELETE_TURN_BUTTON and len(config.turns) > 0:
+                if config.studioEvent == StudioEvents.DELETE_TURN_BUTTON and len(config.ppoints) > 0:
                     config.selectedOperation = StudioActions.DELETE_TURN
 
                 # If Turn Deletion is ready
@@ -778,6 +778,9 @@ def main() -> None:
                 #                                                    location=[config.points[config.turns[i][0]][0] + 10,
                 #                                                              config.points[config.turns[i][0]][1] + 10],
                 #                                                    color='dark blue')
+
+                for point in config.ppoints:
+                    point.render(field, action=config.selectedOperation)
 
                 # Draw robot on the field and ensures the robot cannot be magically clipping through
                 # the field walls (robot starts touching field wall if outside boundary)

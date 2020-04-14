@@ -219,6 +219,8 @@ class Point(object):
 
         # Rendering attributes
         self.circle = None  # A circle marker.
+        self.addTurnMarker = None
+        self.deleteTurnMarker = None
         self.deleteMarker = None
         self.turnIndicator = None
 
@@ -242,13 +244,14 @@ class Point(object):
         """
 
         if self.index == 0:
-            self.circle = canvas.draw_circle(self.x, self.y, 5)
+            self.circle = canvas.draw_circle((self.x, self.y), 5)
 
         # if self.turn:
         #     self.turnIndicator = canvas.draw
 
         if action == enums.StudioActions.DELETE_POINT:
-            pass
+            if self.deleteMarker is None:
+                self.deleteMarker = canvas.draw_circle((self.x, self.y), 10, fill_color='red')
         else:
             if self.deleteMarker is not None:
                 logger.debug(f'Removing Point {self.index}\'s Point Delete Marker')
@@ -262,7 +265,9 @@ class Point(object):
                 self.addTurnMarker = canvas.delete_figure(self.addTurnMarker)
 
         if action == enums.StudioActions.DELETE_TURN:
-            pass
+            if self.deleteTurnMarker is None:
+                pass
+                # self.deleteTurnMarker = canvas.draw_circle()
         else:
             if self.deleteTurnMarker is not None:
                 logger.debug(f'Removing Point {self.index}\'s Turn Delete Marker')
